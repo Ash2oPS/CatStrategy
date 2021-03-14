@@ -4,7 +4,7 @@ init:
     $ eau = int(0)
     $ argent = int(0)
     $ membre = int(0)
-
+    $ membreAttaque = 1
     #Portrait Joueur défini dans le label test_choix_clan
     $ portraitJoueur = ""
 
@@ -17,8 +17,8 @@ init:
 
 
     $ listScene = ["dialog1", "dialog2", "dialog3", "dialog4", "dialog5", "dialog6"] #Liste des différents dialogues
-    $ listPortrait = ["portrait_clan_1","portrait_clan_2","portrait_clan_3"]    #Liste des portrait de chat
-    $ choixClan = False #Choix du clan du joueur
+    $ listPortrait = ["portrait_clan_1","portrait_clan_2","portrait_clan_3"]    #Liste des portrait de chef de clan
+    $ choixClan = False #Deviens True quand le joueur à séléctionner un clan dans l'écran de choix de clan
     $ dialogue = 0  #Nombre de dialogue dans une journée
     $ ressourceNegociation = ["nourriture", "Eau", "Argent"]    #Liste des ressources pour en choisir aléatoirement pour les négociations
     $ ressourceDemanderNombre = 0   #Nombre de ressources qui sera demander au joueur pour les négociations
@@ -33,7 +33,7 @@ screen choix_clan: #À FIX le selected_idle fait n'imp
         idle "image_clan_1"
         hover "image_clan_1_hover"
         selected_idle "image_clan_1_hover"
-        action SetVariable ("nourriture", 3), SetVariable ("eau", 100), SetVariable ("argent", 150), SetVariable ("membre", 33), SetVariable("portraitJoueur", "portrait_clan_1"), SetVariable("membreClan1", 40), SetVariable("membreClan2", 27), SetVariable("choixClan", True)
+        action SetVariable ("nourriture", 125), SetVariable ("eau", 100), SetVariable ("argent", 150), SetVariable ("membre", 33), SetVariable("portraitJoueur", "portrait_clan_1"), SetVariable("membreClan1", 40), SetVariable("membreClan2", 27), SetVariable("choixClan", True)
 
 
     imagebutton:
@@ -56,7 +56,7 @@ screen choix_clan: #À FIX le selected_idle fait n'imp
 
         textbutton "Choisir":
             if choixClan:
-                action Jump("test_ecran_dialogue")
+                action Jump("delete_portrait_list")
 
 
 screen dialogue: #Ecran lors d'un dialogue
@@ -206,36 +206,36 @@ screen combat:
         text "[argentAdv]":
             ypos 140
 
-        text "[membreClan1]":
+        text "[membreClanAdverse]":
             ypos 203
 
 screen boutton_vole_nourriture: #Boutton pour voler de la nourriture après un combat gagné
     frame:
         xpos 244+396+75
-        ypos 158
+        ypos 150
         textbutton "Voler":
-            action SetVariable("nourriture", int(nourriture+nourritureAdv*0.33)), Jump("nouveau_jour")
+            action SetVariable("nourriture", int(nourriture+nourritureAdv*0.33)), Jump("post_combat_gagner")
 
 screen boutton_vole_eau:    #Boutton pour voler de l'eau après un combat gagné
     frame:
         xpos 244+396+75
-        ypos 224
+        ypos 242
         textbutton "Voler":
-            action SetVariable("eau", int(eau+eauAdv*0.33)), Jump("nouveau_jour")
+            action SetVariable("eau", int(eau+eauAdv*0.33)), Jump("post_combat_gagner")
 
 screen boutton_vole_argent: #Boutton pour voler de l'argent après un combat gagné
     frame:
         xpos 244+396+75
-        ypos 290
+        ypos 334
         textbutton "Voler":
-            action SetVariable("argent", int(argent+argentAdv*0.33)), Jump("nouveau_jour")
+            action SetVariable("argent", int(argent+argentAdv*0.33)), Jump("post_combat_gagner")
 
 screen boutton_vole_territoire: #Boutton pour voler des membres/territoires après un combat gagné
     frame:
         xpos 244+396+75
-        ypos 353
+        ypos 426
         textbutton "Voler":
-            action SetVariable("membre", membre+(5+int(membreClan1*0.1))), SetVariable("membreClan1",membreClan1-(5+int(membreClan1*0.1))), Jump("nouveau_jour")
+            action SetVariable("membre", (membre+(5+float(membreClanAdverse*0.1)))), SetVariable("membreClanAdverse",membreClanAdverse-(5+float(membreClanAdverse*0.1))), Jump("post_combat_gagner")
 
 #--------------------------------------------------------------------------------------------------------
 
@@ -254,7 +254,16 @@ label test_choix_clan:  #Choix du clan en début de partie
 
     jump test_choix_clan
 
-label test_ecran_dialogue:  #Placeholder de l'écran de dialogue
+label delete_portrait_list:
+    if (portraitJoueur == 'portrait_clan_1'):
+        $ listPortrait.pop(0)
+    elif (portraitJoueur == 'portrait_clan_2'):
+        $ listPortrait.pop(1)
+    else:
+        $ listPortrait.pop(2)
+
+
+label dialogue:  #Placeholder de l'écran de dialogue
     hide screen choix_clan
     scene white_background
     show screen dialogue
@@ -268,14 +277,14 @@ label test_ecran_dialogue:  #Placeholder de l'écran de dialogue
     jump expression listScene[sceneRandom]
 
 label negociation:  #Scene des negociation
-
-    $ clanAttaquant = portraitJoueur    #Choix aleatoire du clan qui attaque
-    while clanAttaquant == portraitJoueur:
-        $randomAttaquant = renpy.random.randint(0,2)
-        $clanAttaquant = listPortrait[randomAttaquant]
+    #Choix aleatoire du clan qui attaque
+    $ randomAttaquant = renpy.random.randint(0,1)
+    $ clanAttaquant = listPortrait[randomAttaquant]
 
     scene white_background
     show screen negociation #Affiche l'écran des negociations
+
+    #if randomAttaquant == 0:
 
     $ ressourceProposerRand = renpy.random.randint(0,2) #Choisi quel ressource est proposer aléatoirement
     $ ressourceDemanderRand = ressourceProposerRand
@@ -341,29 +350,35 @@ label negociation:  #Scene des negociation
 
 label dialog1:
     e "1"
-    jump test_ecran_dialogue
+    jump dialogue
 
 label dialog2:
     e "2"
-    jump test_ecran_dialogue
+    jump dialogue
 
 label dialog3:
     e "3"
-    jump test_ecran_dialogue
+    jump dialogue
 
 label dialog4:
     e "4"
-    jump test_ecran_dialogue
+    jump dialogue
 
 label dialog5:
     e "5"
-    jump test_ecran_dialogue
+    jump dialogue
 
 label dialog6:
     e "6"
-    jump test_ecran_dialogue
+    jump dialogue
 
 label combat:   #Ecran de combat
+
+    if randomAttaquant == 0:
+        $ membreClanAdverse = membreClan1
+
+    else:
+        $ membreClanAdverse = membreClan2
 
     #Ressource aléatoire du clan adverse
     $ nourritureAdv = renpy.random.randint(membreClan1*2-10,membreClan1*2+10)
@@ -377,7 +392,14 @@ label combat:   #Ecran de combat
 
     ""
 
-    jump combat_gagner
+    $ randomOutcome = renpy.random.randint(0,100)   #Variable qui décidera qui gagne dans le combat
+    if ((float(membre*membreAttaque)/(membre*membreAttaque+membreClanAdverse))*100 > randomOutcome):
+        "Vous avez gagné !"
+        jump combat_gagner
+
+    else:
+        "Vous avez perdu !"
+        jump nouveau_jour
 
 label combat_gagner:    #Afficher les boutons pour voler les ressource si le combat est gagné
 
@@ -389,6 +411,20 @@ label combat_gagner:    #Afficher les boutons pour voler les ressource si le com
 
     jump combat_gagner
 
+label post_combat_gagner:
+    $ membre = int(membre)
+
+
+    if randomAttaquant == 0:
+        $ membreClan1 = int(membreClanAdverse)
+
+    else:
+        $ membreClan2 = int(membreClanAdverse)
+
+    if (membre + membreClan1 + membreClan2)%2 ==1:
+        $ membre +=1
+
+    jump nouveau_jour
 
 label nouveau_jour: #Changement de jour
     $ dialogue = 0  #Nombre de dialogue par jour reviens à 0
@@ -402,17 +438,19 @@ label nouveau_jour: #Changement de jour
     "{color=#000000}Un nouveau jour commence{/color}"
     $ nourriture -= membre/2    #Les membres du joueur mangent
     if (nourriture < 0):    #Si le joueur n'a pas assez de nourriture
-        $ chanceMemberLeave= renpy.random.randint(0,100)    #nombre aléatoire entre 0 et 100
-        if (chanceMemberLeave < (nourriture*8)*-1):     #Si le nombre aleatoire est inférieur à la nourriture manquante *8 des membres partent
-            $ membreClan1 += int(0.5 *int(5+membre*0.1))
+        $ chanceMemberLeave= renpy.random.randint(0,100)    #Nombre aléatoire entre 0 et 100
+        if (chanceMemberLeave < 10+(nourriture*10)*-1):     #Si le joueur perd des membre (10% + 5% par membre qui n'a pas mangé de provoqué la perte de membre pour le joueur si il n'a pas assez de nourriture)
+            $ membreClan1 += int(0.5 *int(5+membre*0.1))    #Les deux clans se partage les membres qui partent
             $ membreClan2 += int(0.5 * int(5+membre*0.1))
-            if (int(5+(membre*0.1))%2 > 0):   #Si le nombres de membre qui part est impaire, un membre est perdu dans les arrondis
-                $ membreClan1 +=1   #On le rajoute arbitrairement au premier clan adverse
             $ membre -= int(5+membre*0.1) #Le joueur perd les membres qui partent
             $ nourriture = 0    #Nourriture reviens à 0
 
         else:
             $ nourriture = 0
+    if membre < 0:
+        $ membreClan1 += membre
+        $ membre = 0
+    if (membre + membreClan1 + membreClan2)%2 == 1:
+        $ membreClan1 +=1
 
-
-    jump test_ecran_dialogue
+    jump dialogue

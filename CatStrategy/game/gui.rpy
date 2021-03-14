@@ -206,6 +206,7 @@ define gui.quick_button_text_selected_color = gui.accent_color
 define gui.choice_button_width = 790
 define gui.choice_button_height = None
 define gui.choice_button_tile = False
+define gui.choice_button_ypos = 700
 define gui.choice_button_borders = Borders(100, 5, 100, 5)
 define gui.choice_button_text_font = gui.text_font
 define gui.choice_button_text_size = gui.text_size

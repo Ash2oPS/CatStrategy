@@ -94,7 +94,8 @@ style frame:
 ## and id "window" to apply style properties.
 ##
 ## https://www.renpy.org/doc/html/screen_special.html#say
-
+define what_ypos = -365
+define what_xpos = -150
 screen say(who, what):
     style_prefix "say"
 
@@ -107,8 +108,11 @@ screen say(who, what):
                 id "namebox"
                 style "namebox"
                 text who id "who"
+                text what id "what" xpos what_xpos ypos what_ypos
 
-        text what id "what"
+
+        else:
+            text what id "what"
 
 
     ## If there's a side image, display it above the text. Do not display on the
@@ -135,6 +139,7 @@ style window:
     xfill True
     yalign gui.textbox_yalign
     ysize gui.textbox_height
+    xsize gui.textbox_width
 
     background Image("gui/textbox.png", xalign=0.5, yalign=1.0)
 

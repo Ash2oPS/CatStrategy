@@ -2,6 +2,7 @@ init:
     #Ressource Joueur
     $ nourriture = 0 #Nombre de nourriture
     $ eau = 0        #Nombre d'eau
+    $ eauMax = 100   #Nombre maximum d'eau pour le joueur
     $ argent = 0     #Nombre d'argent
     $ membre = 0     #Nombre de membre
 
@@ -38,7 +39,10 @@ init:
     $ ressourceProposerNombre = 0   #Nombre de ressources qui sera proposer au joueur pour les négociations
     $ clanAttaquant = ""    #Portrait du clan attaquant le joueur
     $ test = ""
+
 define slowDissolve = Dissolve(1.5)
+
+define chat = Character("")
 
 screen choix_clan: #A FIX le selected_idle fait n'imp
     imagebutton:
@@ -242,10 +246,9 @@ screen boutton_vole_territoire: #Boutton pour voler des membres/territoires apr�
 #--------------------------------------------------------------------------------------------------------
 
 label start:
-
     jump choix_clan
 
-    return
+
 
 label choix_clan:  #Choix du clan en début de partie
     scene fond
@@ -266,6 +269,8 @@ label delete_player_portrait_list:
 
 
 label dialogue:  #Placeholder de l'écran de dialogue
+    scene fond
+    with slowDissolve
     hide screen choix_clan
 
     show screen dialogue
@@ -273,13 +278,21 @@ label dialogue:  #Placeholder de l'écran de dialogue
     $ dialogue +=1
     $ dialogueOk = False
 
+    #image de chat aléatoire
+    $ randomChat = renpy.random.randint(0, len(listChat))
+    $ chatParlant = listChat[randomChat]
+
+
     if dialogue == 2:
-        $ filtre = renpy.random.randint(int((membre*0.25)*boostFiltre),int((membre*0.4)*boostFiltre)) #Avant le 2ème dialogue dialogues des chats reviennent avec de l'eau
-        "Vos explorateurs sont revenu avec [filtre] d'eau."
+        $ filtre = renpy.random.randint(int((membre*0.7)*boostFiltre),int((membre*0.9)*boostFiltre)) #Avant le 2ème dialogue dialogues des chats reviennent avec de l'eau
+        chat "Vos explorateurs sont revenu avec [filtre] d'eau. "
         $ eau += filtre
+        if eau > eauMax:
+            $ eau = eauMax
+
     if dialogue == 4:
-        $ chasse = renpy.random.randint(int((membre*0.20)*boostRecolte),int((membre*0.35)*boostRecolte))  #Avant le 4ème dialogue dialogues des chats reviennent avec de l'eau
-        "Vos chasseurs sont revenu avec [chasse] de nourritures."
+        $ chasse = renpy.random.randint(int((membre*0.6)*boostRecolte),int((membre*0.8)*boostRecolte))  #Avant le 4ème dialogue dialogues des chats reviennent avec de l'eau
+        chat "Vos chasseurs sont revenu avec [chasse] de nourritures."
         $ nourriture += chasse
 
     if dialogue == 5:   #Après 4 dialogues aléatoire
@@ -294,7 +307,6 @@ label dialogue:  #Placeholder de l'écran de dialogue
                     dialogueOk = False  #si c'est le cas on reste dans la boucle
 
     $ listSceneUsed[dialogue-1] = sceneRandom   #On met l'indice du dialogue dans une autre liste
-    "[listSceneUsed[0]] | [listSceneUsed[1]] | [listSceneUsed[2]] | [listSceneUsed[3]] | [listSceneUsed[4]] "
     jump expression listScene[sceneRandom]
 
 label negociation:  #Scene des negociation
@@ -329,16 +341,14 @@ label negociation:  #Scene des negociation
     else:
         $ argentADv = int(ressourceProposerNombre*1.5+163)
 
-
-
-    "On vous donne [ressourceProposerNombre] [ressourceProposer] contre [ressourceDemanderNombre] [ressourceDemander]"
+    chat "On vous donne [ressourceProposerNombre] [ressourceProposer] contre [ressourceDemanderNombre] [ressourceDemander]"
 
     #Si le joueur n'a pas assez de ressource pour l'échange
 
     if (ressourceDemanderRand == 0 and ressourceDemanderNombre > nourriture or ressourceDemanderRand == 1 and ressourceDemanderNombre > eau or ressourceDemanderRand == 2 and ressourceDemanderNombre > argent):
 
         menu:
-            "On vous donne [ressourceProposerNombre] [ressourceProposer] contre [ressourceDemanderNombre] [ressourceDemander]"
+            chat "On vous donne [ressourceProposerNombre] [ressourceProposer] contre [ressourceDemanderNombre] [ressourceDemander]"
             "Refuser":
                 $ combattre = renpy.random.randint(0,1) #Si le joueur refuse l'échange il a une chance sur deux de devoir se battre
                 if (combattre == 1):
@@ -352,7 +362,7 @@ label negociation:  #Scene des negociation
 
     else :  #Si le joueur a assez de ressource
         menu:
-            "On vous donne [ressourceProposerNombre] [ressourceProposer] contre [ressourceDemanderNombre] [ressourceDemander]"
+            chat "On vous donne [ressourceProposerNombre] [ressourceProposer] contre [ressourceDemanderNombre] [ressourceDemander]"
 
             "Accepter":  #Si le joueur accepte l'échange on retire les ressource demander au joueur et ajoute celle proposer
                 if (ressourceDemanderRand == 0):
@@ -369,6 +379,8 @@ label negociation:  #Scene des negociation
 
                 elif (ressourceProposerRand == 1):
                     $ eau += ressourceProposerNombre
+                    if eauMax > eau:
+                        $ eau = eauMax
 
                 elif (ressourceProposerRand == 2):
                     $ argent += ressourceProposerNombre
@@ -390,31 +402,31 @@ label negociation:  #Scene des negociation
                 jump combat
 
 label dialog0:
-    "0"
+    chat "0"
     jump dialogue
 
 label dialog1:
-    "1"
+    chat "1"
     jump dialogue
 
 label dialog2:
-    "2"
+    chat "2"
     jump dialogue
 
 label dialog3:
-    "3"
+    chat "3"
     jump dialogue
 
 label dialog4:
-    "4"
+    chat "4"
     jump dialogue
 
 label dialog5:
-    "5"
+    chat "5"
     jump dialogue
 
 label dialog6:
-    "6"
+    chat "6"
     jump dialogue
 
 label combat:   #Ecran de combat
@@ -499,8 +511,9 @@ label nouveau_jour: #Changement de jour
     hide screen combat
     scene nouveau_jour
     with slowDissolve
-    "{color=#000000}Un nouveau jour commence{/color}"
-
+    python:
+        for i in range(5):
+            listSceneUsed[i] = 0
     $ nourriture -= membre/2    #Les membres du joueur mangent
     $ nourriturePerdu = membre/2
 

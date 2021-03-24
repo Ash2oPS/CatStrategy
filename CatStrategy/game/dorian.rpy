@@ -1,7 +1,11 @@
+init -1 python:
+    import math
+
 init:
     #Ressource Joueur
     $ nourriture = 0 #Nombre de nourriture
     $ eau = 0        #Nombre d'eau
+    $ eauMax = 100   #Nombre maximum d'eau pour le joueur
     $ argent = 0     #Nombre d'argent
     $ membre = 0     #Nombre de membre
 
@@ -19,17 +23,18 @@ init:
     $ eauAdv = 35
     $ argentAdv = 44
     $ membreClan1 = 0
+    $ clan1Vivant = True
     $ membreClan2 = 0
-
-
-
+    $ clan2Vivant = True
 
     #list des portraits de chat
 
     $ listChat = ["chat1a1","chat1a2","chat1a3","chat1a4","chat1a5","chat1a6","chat1a7","chat1a8","chat1a9","chat1a10","chat1a11","chat1a12","chat1a13","chat1a14","chat1a15","chat1a16","chat1a17","chat1a18","chat1a19","chat1a20","chat1a21","chat1a22","chat1b1","chat1b2","chat1b3","chat1b4","chat1b5","chat1b6","chat1b7","chat1b8","chat1b9","chat1b10","chat1b11","chat1b12","chat1b13","chat1b14","chat1b15","chat1b16","chat1b17","chat1b18","chat1b19","chat1b20", "chat1b21","chat1b22", "chat2a1","chat2a2","chat2a3","chat2a4","chat2a5","chat2a6","chat2a7","chat2a8","chat2a9","chat2a10","chat2a11","chat2a12","chat2a13","chat2a14","chat2a15","chat2a16","chat2a17","chat2a18","chat2a19","chat2a20","chat2a21","chat2a22","chat2b1","chat2b2","chat2b3","chat2b4","chat2b5","chat2b6","chat2b7","chat2b8","chat2b9","chat2b10","chat2b11","chat2b12","chat2b13","chat2b14","chat2b15","chat2b16","chat2b17","chat2b18","chat2b19","chat2b20", "chat2b21","chat2b22"]
     $ chatParlant = listChat[65]    #Portrait du chat en train de parler
 
-    $ listScene = ["dialog1", "dialog2", "dialog3", "dialog4", "dialog5", "dialog6"] #Liste des différents dialogues
+    $ listScene = ["dialog0", "dialog1", "dialog2", "dialog3", "dialog4", "dialog5", "dialog6"] #Liste des différents dialogues
+    $ listSceneUsed = [10, 10, 10, 10, 10]
+    $ dialogueOk = False    #Sert à vérifier si un dialogue est déjà passer aujourd'hui
     $ listPortrait = ["portrait_clan_1","portrait_clan_2","portrait_clan_3"]    #Liste des portrait de chef de clan
     $ choixClan = False #Deviens True quand le joueur à séléctionner un clan dans l'écran de choix de clan
     $ jour = 0
@@ -38,9 +43,13 @@ init:
     $ ressourceDemanderNombre = 0   #Nombre de ressources qui sera demander au joueur pour les négociations
     $ ressourceProposerNombre = 0   #Nombre de ressources qui sera proposer au joueur pour les négociations
     $ clanAttaquant = ""    #Portrait du clan attaquant le joueur
+    $ test = ""
 
+define slowDissolve = Dissolve(1.5)
 
-screen choix_clan: #À FIX le selected_idle fait n'imp
+define chat = Character("")
+
+screen choix_clan: #A FIX le selected_idle fait n'imp
     imagebutton:
         xpos 140
         idle "image_clan_1"
@@ -242,10 +251,9 @@ screen boutton_vole_territoire: #Boutton pour voler des membres/territoires apr�
 #--------------------------------------------------------------------------------------------------------
 
 label start:
-
     jump choix_clan
 
-    return
+
 
 label choix_clan:  #Choix du clan en début de partie
     scene fond
@@ -266,37 +274,57 @@ label delete_player_portrait_list:
 
 
 label dialogue:  #Placeholder de l'écran de dialogue
+    scene fond
+    with slowDissolve
     hide screen choix_clan
 
     show screen dialogue
     $ jour += 1
     $ dialogue +=1
+    $ dialogueOk = False
+
+    #image de chat aléatoire
+    $ randomChat = renpy.random.randint(0, len(listChat)-1)
+    $ chatParlant = listChat[randomChat]
+
 
     if dialogue == 2:
-        $ filtre = renpy.random.randint(int((membre*0.25)*boostFiltre),int((membre*0.4)*boostFiltre)) #Avant le 2ème dialogue dialogues des chats reviennent avec de l'eau
-        "Vos explorateurs sont revenu avec [filtre] d'eau."
+        $ filtre = renpy.random.randint(int((membre*0.7)*boostFiltre),int((membre*0.9)*boostFiltre)) #Avant le 2ème dialogue dialogues des chats reviennent avec de l'eau
+        chat "Vos explorateurs sont revenu avec [filtre] d'eau. "
         $ eau += filtre
+        if eau > eauMax:
+            $ eau = eauMax
+
     if dialogue == 4:
-        $ chasse = renpy.random.randint(int((membre*0.20)*boostRecolte),int((membre*0.35)*boostRecolte))  #Avant le 4ème dialogue dialogues des chats reviennent avec de l'eau
-        "Vos chasseurs sont revenu avec [chasse] de nourritures."
+        $ chasse = renpy.random.randint(int((membre*0.6)*boostRecolte),int((membre*0.8)*boostRecolte))  #Avant le 4ème dialogue dialogues des chats reviennent avec de l'eau
+        chat "Vos chasseurs sont revenu avec [chasse] de nourritures."
         $ nourriture += chasse
 
     if dialogue == 5:   #Après 4 dialogues aléatoire
         jump negociation    #Negociation aléatoire avec un clan adverse
 
-    $ sceneRandom = renpy.random.randint(0,len(listScene)-1) #Jump dans un label aléatoire présent dans la variable listScene
+    python:
+        while not dialogueOk:
+            dialogueOk = True
+            sceneRandom = renpy.random.randint(0,len(listScene)-1) #Choix aléatoire du dialogue
+            for i in listSceneUsed:
+                if sceneRandom == i:    #On vérifie que le dialogue n'est pas déjà passé aujourd'hui
+                    dialogueOk = False  #si c'est le cas on reste dans la boucle
+
+    $ listSceneUsed[dialogue-1] = sceneRandom   #On met l'indice du dialogue dans une autre liste
     jump expression listScene[sceneRandom]
 
 label negociation:  #Scene des negociation
     #Choix aleatoire du clan qui attaque
-    $ randomAttaquant = renpy.random.randint(0,1)
-    $ clanAttaquant = listPortrait[randomAttaquant] #Portrait du chef de clan qui attaque
+    if (clan1Vivant and clan2Vivant):
+        $ randomAttaquant = renpy.random.randint(0,len(listPortrait)-1)
+    else:
+        $ randomAttaquant = 0
 
+    $ clanAttaquant = listPortrait[randomAttaquant] #Portrait du chef de clan qui négocie/attaque
+    $ chatParlant = listPortrait[randomAttaquant]
 
-
-    #if randomAttaquant == 0:
-
-    $ ressourceProposerRand = renpy.random.randint(0,2) #Choisi quel ressource est proposer aléatoirement
+    $ ressourceProposerRand = renpy.random.randint(0,2) #Choisi aléatoirement quel ressource est proposer
     $ ressourceDemanderRand = ressourceProposerRand
     while ressourceDemanderRand==ressourceProposerRand: #Tant que la ressource demander est la même que celle proposer
         $ ressourceDemanderRand = renpy.random.randint(0,2) #Choisi quel ressource est demander aléatoirement
@@ -305,14 +333,9 @@ label negociation:  #Scene des negociation
     $ ressourceProposer = ressourceNegociation[ressourceProposerRand]
     $ ressourceDemander = ressourceNegociation[ressourceDemanderRand]
 
-    #Ressource aléatoire du clan adverse
-    $ nourritureAdv = renpy.random.randint(membreClan1*2-10,membreClan1*2+10)
-    $ eauAdv = renpy.random.randint(25,100)
-    $ argentAdv = renpy.random.randint(int(membreClan1*3*0.7),int(membreClan1*3*1.3))
-
     #Faire en sorte que le clan adverse à plus de ressources que ce qu'il offrait au joueur
     if (ressourceProposerRand == 0):
-        $ nourritureAdv = int(ressourceProposerNombre*1.25+93)
+        $ nourritureAdv = int(ressourceProposerNombre*1.25+50)
 
     elif (ressourceProposerRand == 1):
         $ eauAdv = int(ressourceProposerNombre+75)
@@ -322,16 +345,14 @@ label negociation:  #Scene des negociation
     else:
         $ argentADv = int(ressourceProposerNombre*1.5+163)
 
-
-
-    "On vous donne [ressourceProposerNombre] [ressourceProposer] contre [ressourceDemanderNombre] [ressourceDemander]"
+    chat "On vous donne [ressourceProposerNombre] [ressourceProposer] contre [ressourceDemanderNombre] [ressourceDemander]"
 
     #Si le joueur n'a pas assez de ressource pour l'échange
 
     if (ressourceDemanderRand == 0 and ressourceDemanderNombre > nourriture or ressourceDemanderRand == 1 and ressourceDemanderNombre > eau or ressourceDemanderRand == 2 and ressourceDemanderNombre > argent):
 
         menu:
-            "On vous donne [ressourceProposerNombre] [ressourceProposer] contre [ressourceDemanderNombre] [ressourceDemander]"
+            chat "On vous donne [ressourceProposerNombre] [ressourceProposer] contre [ressourceDemanderNombre] [ressourceDemander]"
             "Refuser":
                 $ combattre = renpy.random.randint(0,1) #Si le joueur refuse l'échange il a une chance sur deux de devoir se battre
                 if (combattre == 1):
@@ -345,7 +366,7 @@ label negociation:  #Scene des negociation
 
     else :  #Si le joueur a assez de ressource
         menu:
-            "On vous donne [ressourceProposerNombre] [ressourceProposer] contre [ressourceDemanderNombre] [ressourceDemander]"
+            chat "On vous donne [ressourceProposerNombre] [ressourceProposer] contre [ressourceDemanderNombre] [ressourceDemander]"
 
             "Accepter":  #Si le joueur accepte l'échange on retire les ressource demander au joueur et ajoute celle proposer
                 if (ressourceDemanderRand == 0):
@@ -362,10 +383,11 @@ label negociation:  #Scene des negociation
 
                 elif (ressourceProposerRand == 1):
                     $ eau += ressourceProposerNombre
+                    if eauMax > eau:
+                        $ eau = eauMax
 
                 elif (ressourceProposerRand == 2):
                     $ argent += ressourceProposerNombre
-
 
                 jump nouveau_jour
 
@@ -382,39 +404,47 @@ label negociation:  #Scene des negociation
             "Attaquer":
                 jump combat
 
+label dialog0:
+    chat "0"
+    jump dialogue
 
 label dialog1:
-    "1"
+    chat "1"
     jump dialogue
 
 label dialog2:
-    "2"
+    chat "2"
     jump dialogue
 
 label dialog3:
-    "3"
+    chat "3"
     jump dialogue
 
 label dialog4:
-    "4"
+    chat "4"
     jump dialogue
 
 label dialog5:
-    "5"
+    chat "5"
     jump dialogue
 
 label dialog6:
-    "6"
+    chat "6"
     jump dialogue
 
 label combat:   #Ecran de combat
 
-    if randomAttaquant == 0:
+    if (randomAttaquant == 0 and clan1Vivant):
         $ membreClanAdverse = membreClan1
 
     else:
         $ membreClanAdverse = membreClan2
 
+
+    #Ressource aléatoire du clan adverse
+    $ nourritureAdv = renpy.random.randint(int(membreClanAdverse*1.8),int(membreClanAdverse*2.2))
+    $ eauAdv = renpy.random.randint(25,100)
+    $ argentAdv = renpy.random.randint(int(membreClanAdverse*3*0.7),int(membreClanAdverse*3*1.3))
 
     hide screen dialogue
     show screen combat
@@ -437,12 +467,10 @@ label combat:   #Ecran de combat
             $ argent -= int(30+argent*0.25)
 
 
-        $ membreClan1 += int(0.5 *int(5+membre*0.1))    #Les deux clans adverses se partage les membres qui partent
-        $ membreClan2 += int(0.5 * int(5+membre*0.1))
+        $ membreClan1 += int(math.ceil(0.5 *int(5+membre*0.1)))   #Les deux clans adverses se partage les membres qui partent
+        $ membreClan2 += int(math.floor(0.5 *int(5+membre*0.1)))
         $ membre -= int(5+membre*0.1) #Le joueur perd les membres
 
-        if (membre + membreClan1 + membreClan2)%2 == 1: #Si le total des membre est impaire (un membre s'est perdu dans les pourcentage) on le donne arbitrairement au clan adverse 1
-            $ membreClan1 +=1
 
         if membre < 0:  #Si le joueur n'a plus de membre il a perdu
             $ membreClan1 += membre
@@ -464,17 +492,25 @@ label combat_gagner:    #Afficher les boutons pour voler les ressource si le com
     jump combat_gagner
 
 label post_combat_gagner:
-    $ membre = int(membre)  #les membre du joueur sont convertie en integer pour ne pas avoir de chiffre a virgule dans l'interface
+    $ membre = int(membre)  #les membre du joueur sont convertie en integ pour ne pas avoir de chiffre a virgule dans l'interface
 
-
-    if randomAttaquant == 0:    #Si le clan qui nous a attaqué est le clanAdverse 1
+    if randomAttaquant == 0 and clan1Vivant:    #Si le clan qui nous a attaqué est le clanAdverse 1
         $ membreClan1 = int(membreClanAdverse)  #Son nombre de membre deviens celui du clan qui nous a attaquer
 
     else:                       #Si le clan qui nous a attaqué est le clanAdverse 2
         $ membreClan2 = int(membreClanAdverse)
 
-    if (membre + membreClan1 + membreClan2)%2 ==1:
-        $ membre +=1    #Si le total des membre est impaire (un membre s'est perdu dans les pourcentage) on le donne arbitrairement au joueur
+    if (membreClan1 <= 0 and clan1Vivant):    #Si le clan adverse 1 est en vie mais avec 0 membre
+        $ clan1Vivant = False
+        $ membre += membreClan1
+        $ membreClan1 = 0
+        $ listPortrait.pop(0)
+
+    if (membreClan2 <= 0 and clan2Vivant):    #Si le clan adverse 2 est en vie mais avec 0 membre
+        $ clan2Vivant = False
+        $ membre += membreClan2
+        $ membreClan2 = 0
+        $ listPortrait.pop(len(listPortrait)-1)
 
     jump nouveau_jour
 
@@ -487,8 +523,15 @@ label nouveau_jour: #Changement de jour
     hide screen dialogue
     hide screen negociation
     hide screen combat
-    "{color=#000000}Un nouveau jour commence{/color}"
+    scene nouveau_jour
+    with slowDissolve
 
+    if (not clan1Vivant and not clan2Vivant):
+        jump gagner
+
+    python:
+        for i in range(5):
+            listSceneUsed[i] = 0
     $ nourriture -= membre/2    #Les membres du joueur mangent
     $ nourriturePerdu = membre/2
 
@@ -498,8 +541,8 @@ label nouveau_jour: #Changement de jour
     else:    #Si le joueur n'a pas assez de nourriture
         $ chanceMemberLeave= renpy.random.randint(0,100)    #Nombre aléatoire entre 0 et 100
         if (chanceMemberLeave < 33+(nourriture*6)*-1):     #Si le joueur perd des membre (33% + 3% par membre qui n'a pas mangé de provoqué la perte de membre pour le joueur si il n'a pas assez de nourriture)
-            $ membreClan1 += int(0.5 *int(5+membre*0.1))    #Les deux clans adverses se partage les membres qui partent
-            $ membreClan2 += int(0.5 * int(5+membre*0.1))
+            $ membreClan1 += int(math.ceil(0.5 *int(5+membre*0.1)))    #Les deux clans adverses se partage les membres qui partent
+            $ membreClan2 += int(math.floor(0.5 * int(5+membre*0.1)))
             $ membrePerdu = int(5+membre*0.1)
             $ membre -= int(5+membre*0.1) #Le joueur perd les membres
             $ nourriture = 0    #Nourriture reviens à 0
@@ -508,8 +551,6 @@ label nouveau_jour: #Changement de jour
             "Vous n'avez plus de nourritures, vos membres ne vont pas rester longtemps si ça continue comme ça."
             $ nourriture = 0
 
-    if (membre + membreClan1 + membreClan2)%2 == 1: #Si le total des membre est impaire (un membre s'est perdu dans les pourcentage) on le donne arbitrairement au clan adverse 1
-        $ membreClan1 +=1
 
     if membre < 0:  #Si le joueur n'a plus de membre il a perdu
         $ membreClan1 += membre
@@ -523,10 +564,10 @@ label nouveau_jour: #Changement de jour
         "Vos membres se désaltèrent et vous perdez [nourriturePerdu] eau."
 
     else:    #Si le joueur n'a pas assez de nourriture
-        $ chanceMemberLeave= renpy.random.randint(0,100)    #Nombre aléatoire entre 0 et 100
+        $ chanceMemberLeave = renpy.random.randint(0,100)    #Nombre aléatoire entre 0 et 100
         if (chanceMemberLeave < 33+(eau*6)*-1):     #Si le joueur perd des membre (33% + 3% par membre qui n'a pas mangé de provoqué la perte de membre pour le joueur si il n'a pas assez de nourriture)
-            $ membreClan1 += int(0.5 *int(5+membre*0.1))    #Les deux clans adverses se partage les membres qui partent
-            $ membreClan2 += int(0.5 * int(5+membre*0.1))
+            $ membreClan1 += int(math.ceil(0.5 *int(5+membre*0.1)))    #Les deux clans adverses se partage les membres qui partent
+            $ membreClan2 += int(math.floor(0.5 * int(5+membre*0.1)))
             $ membrePerdu = int(5+membre*0.1)
             $ membre -= int(5+membre*0.1) #Le joueur perd les membres
             $ eau = 0    #Eau reviens à 0
@@ -536,17 +577,44 @@ label nouveau_jour: #Changement de jour
             $ eau = 0
 
     if membre < 0:  #Si le joueur n'a plus de membre il a perdu
-        $ membreClan1 += membre
-        $ membre = 0
         jump perdu
 
-    if (membre + membreClan1 + membreClan2)%2 == 1: #Si le total des membre est impaire (un membre s'est perdu dans les pourcentage) on le donne arbitrairement au clan adverse 1
-        $ membreClan1 +=1
+    #Combat entre les deux clans adverses si ils sont tout les deux encore là
+    if (clan1Vivant and clan2Vivant):
+        $ randomOutcome = renpy.random.randint(0,100)
+        if ((float(membreClan1)/(membreClan1+membreClan2))*100 <= randomOutcome):   #Clan1 gagne
+            $ membreClan1 += int(math.floor(2+membreClan2*0.05))
+            $ membreClan2 -= int(math.floor(2+membreClan2*0.05))
 
+        else:   #Clan2 gagne
+            $ membreClan1 -= int(math.floor(2+membreClan1*0.05))
+            $ membreClan2 += int(math.floor(2+membreClan1*0.05))
+
+
+    if (membreClan1 <= 0 and clan1Vivant):    #Si le clan adverse 1 est en vie mais avec 0 membre
+        $ clan1Vivant = False
+        $ membre += membreClan1
+        $ membreClan1 = 0
+        $ listPortrait.pop(0)
+
+    if (membreClan2 <= 0 and clan2Vivant):    #Si le clan adverse 2 est en vie mais avec 0 membre
+        $ clan2Vivant = False
+        $ membre += membreClan2
+        $ membreClan2 = 0
+        $ listPortrait.pop(len(listPortrait)-1)
+
+    if (membre+membreClan1+membreClan2 != 100):
+        $ membre += 100 - (membre+membreClan1+membreClan2)
     jump dialogue
 
 label perdu:
 
-    "Vous n'avez plus de membre voulant se battre pour vous, vous finissez par rester seul dans une pièce vide,sombre et sans aucun bruit..."
+    "Vous n'avez plus de membre voulant se battre pour vous, vous finissez par rester seul dans une pièce vide, sombre et sans aucun bruit..."
+
+    return
+
+label gagner:
+
+    "Tout les chats sont a vos ordres et plus personne ne questionne votre autorité"
 
     return

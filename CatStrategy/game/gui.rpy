@@ -55,13 +55,13 @@ define gui.interface_text_color = u'#ffffff'
 ## Fonts and Font Sizes ########################################################
 
 ## The font used for in-game text.
-define gui.text_font = "DejaVuSans.ttf"
+define gui.text_font = "CatCafe.ttf"
 
 ## The font used for character names.
-define gui.name_text_font = "DejaVuSans.ttf"
+define gui.name_text_font = "CatCafe.ttf"
 
 ## The font used for out-of-game text.
-define gui.interface_text_font = "DejaVuSans.ttf"
+define gui.interface_text_font = "CatCafe.ttf"
 
 ## The size of normal dialogue text.
 define gui.text_size = 22
@@ -160,7 +160,7 @@ define gui.button_borders = Borders(4, 4, 4, 4)
 define gui.button_tile = False
 
 ## The font used by the button.
-define gui.button_text_font = gui.interface_text_font
+define gui.button_text_font = "CatCafe.ttf"
 
 ## The size of the text used by the button.
 define gui.button_text_size = gui.interface_text_size
@@ -210,7 +210,7 @@ define gui.choice_button_height = None
 define gui.choice_button_tile = False
 define gui.choice_button_ypos = 700
 define gui.choice_button_borders = Borders(100, 5, 100, 5)
-define gui.choice_button_text_font = gui.text_font
+define gui.choice_button_text_font = "CatCafe.ttf"
 define gui.choice_button_text_size = gui.text_size
 define gui.choice_button_text_xalign = 0.5
 define gui.choice_button_text_idle_color = "#cccccc"
@@ -250,7 +250,7 @@ define gui.file_slot_rows = 2
 
 ## The position of the left side of the navigation buttons, relative to the left
 ## side of the screen.
-define gui.navigation_xpos = 40
+define gui.navigation_xpos = 0.5
 
 ## The vertical position of the skip indicator.
 define gui.skip_ypos = 10

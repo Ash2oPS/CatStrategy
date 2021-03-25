@@ -52,6 +52,8 @@ init:
 
 define slowDissolve = Dissolve(1.5)
 
+define fastDissolve = Dissolve(0.5)
+
 define chat = Character("")
 
 screen choix_clan:
@@ -160,10 +162,10 @@ screen combat:
         xpos 200
         ypos 390
 
-        text "[nourriture]":
+        text "[eau]":
             ypos 8
 
-        text "[eau]":
+        text "[nourriture]":
             ypos 35
 
         text "[argent]":
@@ -176,10 +178,10 @@ screen combat:
         xpos 1055
         ypos 390
 
-        text "[nourritureAdv]":
+        text "[eauAdv]":
             ypos 8
 
-        text "[eauAdv]":
+        text "[nourritureAdv]":
             ypos 35
 
         text "[argentAdv]":
@@ -248,8 +250,8 @@ label choix_clan_1:
     $ argent = 150
     $ membre = 33
     $ portraitJoueur = "portrait_clan_1"
-    $ membreClan1 = 40
-    $ membreClan2 = 27
+    $ membreClan1 = 27
+    $ membreClan2 = 40
     $ imageTerritoire = "clanb"
     $ imageTerritoire1 = "clanv"
     $ imageTerritoire2 = "clanr"
@@ -267,8 +269,8 @@ label choix_clan_2:
     $ argent = 250
     $ membre = 27
     $ portraitJoueur = "portrait_clan_2"
-    $ membreClan1 = 40
-    $ membreClan2 = 33
+    $ membreClan1 = 33
+    $ membreClan2 = 40
     $ imageTerritoire = "clanv"
     $ imageTerritoire1 = "clanb"
     $ imageTerritoire2 = "clanr"
@@ -310,18 +312,10 @@ label dialogue:  #Placeholder de l'écran de dialogue
     $ dialogueOk = False
 
     if dialogue == 2:
-        $ chatParlant = "chat1a8"
-        $ filtre = renpy.random.randint(int((membre*0.7)*boostFiltre),int((membre*0.9)*boostFiltre)) #Avant le 2ème dialogue dialogues des chats reviennent avec de l'eau
-        chat "Vos explorateurs sont revenu avec [filtre] d'eau. "
-        $ eau += filtre
-        if eau > eauMax:
-            $ eau = eauMax
+        jump chasseur
 
     if dialogue == 4:
-        $ chatParlant = "chat1b8"
-        $ chasse = renpy.random.randint(int((membre*0.6)*boostRecolte),int((membre*0.8)*boostRecolte))  #Avant le 4ème dialogue dialogues des chats reviennent avec de l'eau
-        chat "Vos chasseurs sont revenu avec [chasse] de nourritures."
-        $ nourriture += chasse
+        jump explorateur
 
     if dialogue == 5:   #Après 4 dialogues aléatoire
         jump negociation    #Negociation aléatoire avec un clan adverse
@@ -340,6 +334,23 @@ label dialogue:  #Placeholder de l'écran de dialogue
 
     $ listSceneUsed[dialogue-1] = sceneRandom   #On met l'indice du dialogue dans une autre liste
     jump expression listScene[sceneRandom]
+
+label chasseur:
+    $ chatParlant = "chat1a8"
+    $ filtre = renpy.random.randint(int((membre*0.7)*boostFiltre),int((membre*0.9)*boostFiltre)) #Avant le 2ème dialogue dialogues des chats reviennent avec de l'eau
+    chat "Vos explorateurs sont revenu avec [filtre] d'eau. "
+    $ eau += filtre
+    if eau > eauMax:
+        $ eau = eauMax
+    jump dialogue
+
+label explorateur:
+    $ chatParlant = "chat1b8"
+    $ chasse = renpy.random.randint(int((membre*0.6)*boostRecolte),int((membre*0.8)*boostRecolte))  #Avant le 4ème dialogue dialogues des chats reviennent avec de l'eau
+    chat "Vos chasseurs sont revenu avec [chasse] de nourritures."
+    $ nourriture += chasse
+
+    jump dialogue
 
 label negociation:  #Scene des negociation
     $ fondDialogue = "negociation"
@@ -361,12 +372,12 @@ label negociation:  #Scene des negociation
     $ ressourceProposer = ressourceNegociation[ressourceProposerRand]
     $ ressourceDemander = ressourceNegociation[ressourceDemanderRand]
 
-    #Faire en sorte que le clan adverse à plus de ressources que ce qu'il offrait au joueur
+    #Faire en sorte que le clan adverse ait plus de ressources que ce qu'il offrait au joueur
     if (ressourceProposerRand == 0):
         $ nourritureAdv = int(ressourceProposerNombre*1.25+50)
 
     elif (ressourceProposerRand == 1):
-        $ eauAdv = int(ressourceProposerNombre+75)
+        $ eauAdv = int(ressourceProposerNombre+30)
         if eauAdv > 100:
             $ eauAdv = 100
 
@@ -475,9 +486,9 @@ label combat:   #Ecran de combat
     $ argentAdv = renpy.random.randint(int(membreClanAdverse*3*0.7),int(membreClanAdverse*3*1.3))
 
     hide screen dialogue
-    with slowDissolve
+    with dissolve
     show screen combat
-    with slowDissolve
+    with fastDissolve
 
     ""
 
@@ -520,6 +531,9 @@ label combat_gagner:    #Afficher les boutons pour voler les ressource si le com
     jump combat_gagner
 
 label post_combat_gagner:
+    if eau>eauMax:
+        $ eau = eauMax
+
     $ membre = int(membre)  #les membre du joueur sont convertie en integ pour ne pas avoir de chiffre a virgule dans l'interface
 
     if randomAttaquant == 0 and clan1Vivant:    #Si le clan qui nous a attaqué est le clanAdverse 1

@@ -5,7 +5,7 @@ label dialogueE1:
 
         chat "Chef ! Un énorme bruit venant de la surface et un séisme se sont fait ressentir dans tout le souterrain. Nos chats ont peur." #Texte du chat qui nous parle (on met chat avant un dialogue quand c'est l'un de nos chat qui nous parle)
 
-        " Payer 40 brins de Catnabis pour prendre parole devant les chats et les rassurer.":  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
+        " Payer 40 brins de Catnabis pour prendre parole devant les chats et les rassurer." if argent >= 40 :  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
             if randomChance == 1:    #Une chance sur trois que ça se passe bien
                 chat "Vous avez été fantastique chef ! Quatre chats d’autres clans nous ont rejoints quand ils ont vu à quel point vous étiez attentif à nos besoins !"
                 $ argent -= 40  # le dollar veux dire qu'on écrit en python, c'est surtout utilisé pour modifié ou créer une valeur
@@ -57,10 +57,10 @@ label dialogueE2:
 
         chat "Bonsoir. Dites, je me demandais si vous pouviez me donner un coup de patte. Nous vivons très mal avec ma famille. Pourriez-vous nous donner une petite avance s’il vous plaît." #Texte du chat qui nous parle (on met chat avant un dialogue quand c'est l'un de nos chat qui nous parle)
 
-        "Leur donner 40 brins de Catnabis.":  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
+        "Leur donner 10 brins de Catnabis." if argent >= 10:  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
             if randomChance == 1:    #Une chance sur trois que ça se passe bien
                 chat "Merci beaucoup, vous êtes le meilleur !"
-                $ argent -= 40
+                $ argent -= 10
 
 
         "Refuser":  #Deuxième choix du joueur
@@ -91,9 +91,9 @@ label dialogueE3:
 
         chat "Chef ! Il nous faut une plus grosse puissance militaire ! Améliorons notre Chaserne d’Entraînement ! Il faut pouvoir se défendre en cas d’attaque ennemie." #Texte du chat qui nous parle (on met chat avant un dialogue quand c'est l'un de nos chat qui nous parle)
 
-        "Améliorer la Chaserne pour 40 brins de Catnabis.":  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
+        "Améliorer la Chaserne pour 30 brins de Catnabis." if argent >= 30 :  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
             chat "C’est une sage décision, chef !"
-            $ argent -= 40
+            $ argent -= 30
             $ membreAttaque += .1
 
 
@@ -112,9 +112,9 @@ label dialogueE4:
 
         chat "Monsieur, nous sommes motivés pour construire un nouveau silo pour contenir notre eau ! Nous ne serons plus obligés de nous limiter à nos petits silos actuels. Vous en pensez quoi ?" #Texte du chat qui nous parle (on met chat avant un dialogue quand c'est l'un de nos chat qui nous parle)
 
-        "Construire un nouveau silo d’eau pour 40 brins de Catnabis.":  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
+        "Construire un nouveau silo d’eau pour 30 brins de Catnabis." if argent >= 30:  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
             chat "C’est une sage décision, chef !"
-            $ argent -= 40
+            $ argent -= 30
             $ eauMax += 50
 
 
@@ -133,9 +133,9 @@ label dialogueE5:
 
         chat "Wesh frère, ça t’dirait qu’on améliore nos fermes à Catnabis ? Avec ça, tu pourras te faireplus d’oseille !" #Texte du chat qui nous parle (on met chat avant un dialogue quand c'est l'un de nos chat qui nous parle)
 
-        "Améliorer les fermes à Catnabis pour 40 brins de Catnabis.":  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
+        "Améliorer les fermes à Catnabis pour 30 brins de Catnabis."if argent >= 30:  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
             chat "Meheh, c’est un plaisir de faire affaire avec vous."
-            $ argent -= 40
+            $ argent -= 30
             $ boostArgent += 1
 
 
@@ -153,9 +153,9 @@ label dialogueE6:
 
         chat "Bonjour, chef. J’ai trouvé le moyen d’améliorer les filtres à eau ! Nous pourrons récolter davantage d’eau quotidiennement !" #Texte du chat qui nous parle (on met chat avant un dialogue quand c'est l'un de nos chat qui nous parle)
 
-        "Améliorer les filtres à eau pour 40 brins de Catnabis.":  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
+        "Améliorer les filtres à eau pour 30 brins de Catnabis."if argent >= 30:  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
             chat "Très bien, je me mets au travail !"
-            $ argent -= 40
+            $ argent -= 30
             $ boostFiltre += 0.1
 
 
@@ -172,9 +172,9 @@ label dialogueE7:
 
         chat "Nous avons besoin de plus de nourriture, chef ! Améliorons notre camp de Chats-seurs pour récupérer plus de rats !" #Texte du chat qui nous parle (on met chat avant un dialogue quand c'est l'un de nos chat qui nous parle)
 
-        "Améliorer le camp de Chats-seurs pour 40 brins de Catnabis":  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
+        "Améliorer le camp de Chats-seurs pour 30 brins de Catnabis"if argent >= 30:  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
             chat "Très bien, je me mets au travail !"
-            $ argent -= 40
+            $ argent -= 30
             $ boostRecolte += 0.1
 
 
@@ -210,7 +210,7 @@ label dialogueE9:
 
         chat "Chef, il n’y a que trois films de disponibles dans notre vidéo-club. Vous voulez pas financer la production de nouveaux ?" #Texte du chat qui nous parle (on met chat avant un dialogue quand c'est l'un de nos chat qui nous parle)
 
-        "Payer 20 brins de Catnabis pour que de nouveaux films voient le jour.":  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
+        "Payer 20 brins de Catnabis pour que de nouveaux films voient le jour."if argent >= 20:  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
             chat "Génial ! Je suis sûr que de nouveaux chats vont venir pour découvrir ces nouveautés !"
             $ argent -= 20  # le dollar veux dire qu'on écrit en python, c'est surtout utilisé pour modifié ou créer une valeur
             $ membre += 2
@@ -241,7 +241,7 @@ label dialogueE10:
 
         chat "Regardez ! Vous avez reçu une lettre de menace ! Elle dit que si vous ne me donnez pas 5 rats, vous serez bientôt assassiné !" #Texte du chat qui nous parle (on met chat avant un dialogue quand c'est l'un de nos chat qui nous parle)
 
-        "Lui donner les 5 rats":  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
+        "Lui donner les 5 rats"if nouriture >= 5:  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
             chat "Vous acceptez ? Vraiment ? Enfin, je veux dire, oui ! C’est une sage décision !"
             $ nourriture -= 5
 
@@ -260,9 +260,9 @@ label dialogueE11:
 
         chat "Quelle horreur ! Les fermes à Catnabis se sont fait dévaliser ! Qu’allons-nous faire ?" #Texte du chat qui nous parle (on met chat avant un dialogue quand c'est l'un de nos chat qui nous parle)
 
-        " Payer 10 rats pour retrouver les voleurs":  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
+        " Payer 10 rats pour retrouver les voleurs"if nourriture >= 10:  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
             chat "Les voleurs ont été appréhendés ! Le Catnabis volé a été récupéré !"
-            $ nourrite -= 10
+            $ nourriture -= 10
 
 
         "Partir vous-même à la poursuite des voleurs.":  #Deuxième choix du joueur
@@ -285,7 +285,7 @@ label dialogueE12:
 
         chat "Nous avons besoin de plus de membres dans notre clan ! Que souhaitez-vous faire ?" #Texte du chat qui nous parle (on met chat avant un dialogue quand c'est l'un de nos chat qui nous parle)
 
-        " Payer 40 brins de Catnabis pour créer une campagne publicitaire.":  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
+        " Payer 40 brins de Catnabis pour créer une campagne publicitaire."if argent >= 40:  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
             if randomChance == 1:    #Une chance sur trois que ça se passe bien
                 chat "“Wow, elle a vraiment fait fureur ! Elle nous a ramené quatre nouveaux chats !"
                 $ argent -= 40  # le dollar veux dire qu'on écrit en python, c'est surtout utilisé pour modifié ou créer une valeur
@@ -319,11 +319,11 @@ label dialogueE12:
                     $ membreClan1 -= 1
 
 
-        "Payer 5 rats pour que vos chats fassent un spectacle inter-clan.":  #Deuxième choix du joueur
+        "Payer 10 rats pour que vos chats fassent un spectacle inter-clan."if nourriture >= 10:  #Deuxième choix du joueur
             if randomChance == 1:
                 chat "Haha, le spectacle a cartonné ! 3 chats se sont joints à nous !"
                 $ membre += 3
-                $ nourriture -= 5
+                $ nourriture -= 10
 
                 if !clan1Vivant:
                     $ membreClan2 -= 3
@@ -338,7 +338,7 @@ label dialogueE12:
             else:
                 chat "Aïe, c’était… pitoyable. L’un de nos chats s’est tellement senti mal à l’aise qu’il a préféré partir."
                 $ membre -= 1
-                $ nourriture -= 5
+                $ nourriture -= 10
 
                 if !clan1Vivant:
                     $ membreClan2 += 1
@@ -365,7 +365,7 @@ label dialogueE13:
 
         chat "Ma femme a réalisé ces super cookies ! Vous voulez en acheter ?" #Texte du chat qui nous parle (on met chat avant un dialogue quand c'est l'un de nos chat qui nous parle)
 
-        "Acheter les cookies pour 10 brins de Catnabis.":  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
+        "Acheter les cookies pour 10 brins de Catnabis."if argent >= 10:  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
             chat "Vous êtes si généreux, merci !"
             $ argent -= 10
 
@@ -403,6 +403,8 @@ label dialogueE14:
             if randomChance == 1:
                 chat "Feuille ! Ha vous avez perdu ! Vous me devez 2 rats !"
                 $ nourriture -= 2
+                if nourriture < 0:
+                    $nourriture = 0
 
             else:
                 chat "Ciseaux ! Rah, bien joué… Tenez, 20 brins de Catnabis..."
@@ -412,6 +414,8 @@ label dialogueE14:
             if randomChance == 1:
                 chat "Ciseaux ! Ha vous avez perdu ! Vous me devez 2 rats !"
                 $ nourriture -= 2
+                if nourriture < 0:
+                    $nourriture = 0
 
             else:
                 chat "Pierre ! Rah, bien joué… Tenez, 20 brins de Catnabis..."
@@ -421,6 +425,8 @@ label dialogueE14:
             if randomChance == 1:
                 chat "Pierre ! Ha vous avez perdu ! Vous me devez 2 rats !"
                 $ nourriture -= 2
+                if nourriture < 0:
+                    $nourriture = 0
 
             else:
                 chat "Feuille ! Rah, bien joué… Tenez, 20 brins de Catnabis..."
@@ -453,11 +459,12 @@ label dialogueE16:
     menu:
         chat "Chef, regardez, j’ai trouvé de quoi remplir 50% d’un silo d’eau. Je vous propose ça contre 8 rats. Entendu ?"
 
-        "Accepter.":
+        "Accepter."if nourriture >= 8:
             chat "Ah génial, j’espère que vous ne boirez pas tout d’un coup !"
+            $ nourriture =- 8
             $ eau += 50
             if eau > eauMax:
-                eau = eauMax
+                $ eau = eauMax
 
         "Refuser.":
             chat "Dans ce cas, je garde toute cette eau pour moi !"
@@ -475,7 +482,7 @@ label dialogueE17:
 
         chat "Monsieur le chef, j’ai, genre, ultra méga faim là ! Soit vous me donnez 3 rats, soit je vais voir ailleurs !" #Texte du chat qui nous parle (on met chat avant un dialogue quand c'est l'un de nos chat qui nous parle)
 
-        "Lui donner 3 rats":
+        "Lui donner 3 rats"if nourriture >= 3:
             chat "Je vais m'éclater la panse ! Ce soir, c'est plateau-télé !"
             $ nourriture -= 3
 

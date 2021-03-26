@@ -9,6 +9,7 @@ init:
     $ argent = 0     #Nombre d'argent
     $ membre = 0     #Nombre de membre
     $ imageTerritoire = ""  #Icone de territoire du joueur
+    $ joueurEchange = False #Si le joueur peut echanger ou non
 
     #Boost des bâtiment
     $ membreAttaque = 1 #Multiplicateur pour la force d'armé du clan
@@ -20,9 +21,10 @@ init:
     $ portraitJoueur = ""
 
     #Ressource Clan adverse
-    $ nourritureAdv = 25
-    $ eauAdv = 35
-    $ argentAdv = 44
+    $ nourritureAdv = 0 #ressource uitlisé lors des combats contre clan
+    $ eauAdv = 0
+    $ argentAdv = 0
+
     $ membreClan1 = 0
     $ clan1Vivant = True
     $ imageTerritoire1 = ""
@@ -34,21 +36,26 @@ init:
     #list des portraits de chat
 
     $ listChat = ["chat1a1","chat1a2","chat1a3","chat1a4","chat1a5","chat1a6","chat1a7","chat1a8","chat1a9","chat1a10","chat1a11","chat1a12","chat1a13","chat1a14","chat1a15","chat1a16","chat1a17","chat1a18","chat1a19","chat1a20","chat1a21","chat1a22","chat1b1","chat1b2","chat1b3","chat1b4","chat1b5","chat1b6","chat1b7","chat1b8","chat1b9","chat1b10","chat1b11","chat1b12","chat1b13","chat1b14","chat1b15","chat1b16","chat1b17","chat1b18","chat1b19","chat1b20", "chat1b21","chat1b22", "chat2a1","chat2a2","chat2a3","chat2a4","chat2a5","chat2a6","chat2a7","chat2a8","chat2a9","chat2a10","chat2a11","chat2a12","chat2a13","chat2a14","chat2a15","chat2a16","chat2a17","chat2a18","chat2a19","chat2a20","chat2a21","chat2a22","chat2b1","chat2b2","chat2b3","chat2b4","chat2b5","chat2b6","chat2b7","chat2b8","chat2b9","chat2b10","chat2b11","chat2b12","chat2b13","chat2b14","chat2b15","chat2b16","chat2b17","chat2b18","chat2b19","chat2b20", "chat2b21","chat2b22", "chat2b23"]
+
     $ chatParlant = listChat[88]    #Portrait du chat en train de parler
 
-    $ listScene = ["dialog0", "dialog1", "dialog2", "dialog3", "dialog4", "dialog5", "dialog6"] #Liste des différents dialogues
-    $ listSceneUsed = [-1, -1, -1, -1, -1]
+    #list des dialogues possible
+    $ listScene = ["double_rats_chasse", "mariage_clan_adverse", "fils_bully", "maison_brule", "offre_rat", "proposition_mariage", "etoile_filante", "peur_chien", "fuite_silo", "rat_geant", "legende_humains", "pull_over", "chien_soutterain", ]
+    $ listSceneUsed = [-1, -1, -1, -1, -1]  #Liste des indices des dialogues déjà utilisé le jour même et la veille
+
     $ dialogueOk = False    #Sert à vérifier si un dialogue est déjà passer aujourd'hui
     $ listPortrait = ["portrait_clan_1","portrait_clan_2","portrait_clan_3"]    #Liste des portrait de chef de clan
     $ choixClan = False #Deviens True quand le joueur à séléctionner un clan dans l'écran de choix de clan
     $ jour = 0
     $ dialogue = 0  #Nombre de dialogue dans une journée
-    $ ressourceNegociation = ["nourriture", "Eau", "Argent"]    #Liste des ressources pour en choisir aléatoirement pour les négociations
+    $ ressourceNegociation = ["Nourriture", "Eau", "Argent"]    #Liste des ressources pour en choisir aléatoirement pour les négociations
     $ ressourceDemanderNombre = 0   #Nombre de ressources qui sera demander au joueur pour les négociations
     $ ressourceProposerNombre = 0   #Nombre de ressources qui sera proposer au joueur pour les négociations
     $ clanAttaquant = ""    #Portrait du clan attaquant le joueur
     $ test = ""
     $ fondDialogue = "dialogue1"
+    $ nombreChoix = "troisChoix.png"
+
 
 define slowDissolve = Dissolve(1.5)
 
@@ -91,7 +98,6 @@ screen dialogue: #Ecran lors d'un dialogue
         ypos 100
 
     add fondDialogue
-    add "dialogue2"
     add "ressources"
 
     text " {color=#000000}[eau]{/color} ":
@@ -195,31 +201,31 @@ screen boutton_vole: #Bouttons pour voler des ressources après un combat gagné
 
     imagebutton:
         xpos 900
-        ypos 390
-        idle "bouton_voler"
-        hover "bouton_voler_hover"
-        action SetVariable("nourriture", int(nourriture+nourritureAdv*0.33)), Jump("post_combat_gagner")
-
-    imagebutton:
-        xpos 900
         ypos 450
         idle "bouton_voler"
         hover "bouton_voler_hover"
-        action SetVariable("eau", int(eau+eauAdv*0.33)), Jump("post_combat_gagner")
+        action SetVariable("nourriture", int(nourriture+nourritureAdv*0.33)), SetVariable("nourriture", int(nourritureAdv-nourritureAdv*0.33)), Jump("post_combat_gagner")
+
+    imagebutton:
+        xpos 900
+        ypos 390
+        idle "bouton_voler"
+        hover "bouton_voler_hover"
+        action SetVariable("eau", int(eau+eauAdv*0.33)), SetVariable("eau", int(eauAdv-eauAdv*0.33)), Jump("post_combat_gagner")
 
     imagebutton:
         xpos 900
         ypos 510
         idle "bouton_voler"
         hover "bouton_voler_hover"
-        action SetVariable("argent", int(argent+argentAdv*0.33)), Jump("post_combat_gagner")
+        action SetVariable("argent", int(argent+argentAdv*0.33)), SetVariable("argentAdv", int(argentAdv-argentAdv*0.33)), Jump("post_combat_gagner")
 
     imagebutton:
         xpos 900
         ypos 570
         idle "bouton_voler"
         hover "bouton_voler_hover"
-        action SetVariable("membre", (membre+(5+float(membreClanAdverse*0.1)))), SetVariable("membreClanAdverse",membreClanAdverse-(5+float(membreClanAdverse*0.1))), Jump("post_combat_gagner")
+        action SetVariable("membre", (membre+int((5+float(membreClanAdverse*0.1))))), SetVariable("membreClanAdverse",membreClanAdverse-int((5+float(membreClanAdverse*0.1)))), Jump("post_combat_gagner")
 
 
 #--------------------------------------------------------------------------------------------------------
@@ -228,7 +234,6 @@ label start:
     scene intro
     ""
 
-    jump choix_clan
 
 label choix_clan:  #Choix du clan en début de partie
     scene fond
@@ -298,9 +303,9 @@ label choix_clan_3:
     jump dialogue
 
 
-label dialogue:  #Placeholder de l'écran de dialogue
+label dialogue:
     $ fondDialogue = "dialogue1"
-    $ chatParlant = "chat2b23"
+    $ chatParlant = "chat2b23"  #image du chat vide
     scene fond
     with slowDissolve
 
@@ -308,20 +313,20 @@ label dialogue:  #Placeholder de l'écran de dialogue
     with dissolve
 
     $ jour += 1
-    $ dialogue +=1
-    $ dialogueOk = False
+    $ dialogue += 1 #Nombre de dialogue de la journée +1
+    $ dialogueOk = False    #Dialogue aléatoire n'est pas déjà passé aujourd'hui
 
-    if dialogue == 2:
-        jump chasseur
-
-    if dialogue == 4:
+    if dialogue == 2:   #le deuxième dialogue
         jump explorateur
+
+    if dialogue == 4:   #le quatrième dialogue
+        jump chasseur
 
     if dialogue == 5:   #Après 4 dialogues aléatoire
         jump negociation    #Negociation aléatoire avec un clan adverse
 
     #image de chat aléatoire
-    $ randomChat = renpy.random.randint(0, len(listChat)-1)
+    $ randomChat = renpy.random.randint(0, len(listChat)-2)
     $ chatParlant = listChat[randomChat]
 
     python:
@@ -332,10 +337,23 @@ label dialogue:  #Placeholder de l'écran de dialogue
                 if sceneRandom == i:    #On vérifie que le dialogue n'est pas déjà passé aujourd'hui
                     dialogueOk = False  #si c'est le cas on reste dans la boucle
 
-    $ listSceneUsed[dialogue-1] = sceneRandom   #On met l'indice du dialogue dans une autre liste
+    if jour == 0 and dialogue == 1: #Premier dialogue du premier jour
+        $ listSceneUsed[0] = sceneRandom    #On met l'indice du dialogue dans la liste
+
+    elif jour == 0 and dialogue == 3:   #Troisième dialogue du premier jour
+        $ listSceneUsed[1] = sceneRandom
+
+
+    elif jour > 0 and dialogue == 1:   #Différent pour les autres jour car on met a l'indice 2 et 3 du tableau et pas 0 et 1
+        $ listSceneUsed[2] = sceneRandom
+
+    else:
+        $ listSceneUsed[3] = sceneRandom
+
+
     jump expression listScene[sceneRandom]
 
-label chasseur:
+label explorateur:
     $ chatParlant = "chat1a8"
     $ filtre = renpy.random.randint(int((membre*0.7)*boostFiltre),int((membre*0.9)*boostFiltre)) #Avant le 2ème dialogue dialogues des chats reviennent avec de l'eau
     chat "Vos explorateurs sont revenu avec [filtre] d'eau. "
@@ -344,7 +362,7 @@ label chasseur:
         $ eau = eauMax
     jump dialogue
 
-label explorateur:
+label chasseur:
     $ chatParlant = "chat1b8"
     $ chasse = renpy.random.randint(int((membre*0.6)*boostRecolte),int((membre*0.8)*boostRecolte))  #Avant le 4ème dialogue dialogues des chats reviennent avec de l'eau
     chat "Vos chasseurs sont revenu avec [chasse] de nourritures."
@@ -384,92 +402,146 @@ label negociation:  #Scene des negociation
     else:
         $ argentADv = int(ressourceProposerNombre*1.5+163)
 
-    chat "On vous donne [ressourceProposerNombre] [ressourceProposer] contre [ressourceDemanderNombre] [ressourceDemander]"
-
     #Si le joueur n'a pas assez de ressource pour l'échange
-
     if (ressourceDemanderRand == 0 and ressourceDemanderNombre > nourriture or ressourceDemanderRand == 1 and ressourceDemanderNombre > eau or ressourceDemanderRand == 2 and ressourceDemanderNombre > argent):
+        $ joueurEchange = False
+    else:
+        $ joueurEchange = True
 
-        menu:
-            chat "On vous donne [ressourceProposerNombre] [ressourceProposer] contre [ressourceDemanderNombre] [ressourceDemander]"
-            "Refuser":
-                $ combattre = renpy.random.randint(0,1) #Si le joueur refuse l'échange il a une chance sur deux de devoir se battre
-                if (combattre == 1):
+
+
+        #Si c'est le clan "Bouffe"
+        if listPortrait[randomAttaquant] == "portrait_clan_1":
+            menu:
+                chat "Bonsoir, monsieur le rival ! J’aimerais beaucoup que vous me donniez [ressourceDemanderNombre] [ressourceDemander] contre [ressourceProposerNombre] [ressourceProposer]. Qu’en dites-vous ?"
+
+                "Accepter" if joueurEchange:
+
+                    if (ressourceDemanderRand == 0):
+                        $ nourriture -= ressourceDemanderNombre
+
+                    elif (ressourceDemanderRand == 1):
+                        $ eau -= ressourceDemanderNombre
+
+                    elif (ressourceDemanderRand == 2):
+                        $ argent -= ressourceDemanderNombre
+
+                    if (ressourceProposerRand == 0):
+                        $ nourriture += ressourceProposerNombre
+
+                    elif (ressourceProposerRand == 1):
+                        $ eau += ressourceProposerNombre
+                        if eauMax > eau:
+                            $ eau = eauMax
+
+                    elif (ressourceProposerRand == 2):
+                        $ argent += ressourceProposerNombre
+
+                    chat "Ça c'est une bien belle affaire, merci collègue !"
                     jump nouveau_jour
 
-                else:
+                "Refuser":
+                    $ combattre = renpy.random.randint(0,1) #Si le joueur refuse l'échange il a une chance sur deux de devoir se battre
+                    if (combattre == 1):
+                        chat "Bah, okay tant pis, peut-être la prochaine fois."
+                        jump nouveau_jour
+
+                    else:
+                        chat "Meh, c’est pas la réponse que j’attendais, et je veux vous prendre ce que j’étais venu chercher !"
+                        jump combat
+
+                "Attaquer":
+                    chat "Oh ? C’est hyper méchant ça ! Mais ok, battons-nous !"
                     jump combat
 
-            "Attaquer":
-                jump combat
+        #Si c'est clan "Riche"
+        elif listPortrait[randomAttaquant] == "portrait_clan_2":
+            menu:
+                chat "Salutations, être inférieur. J’exige que nous procédions à un échange. Je veux [ressourceDemanderNombre] de votre [ressourceDemander] contre [ressourceProposerNombre] de mon [ressourceProposer]."
 
-    else :  #Si le joueur a assez de ressource
-        menu:
-            chat "On vous donne [ressourceProposerNombre] [ressourceProposer] contre [ressourceDemanderNombre] [ressourceDemander]"
+                "Accepter" if joueurEchange:
 
-            "Accepter":  #Si le joueur accepte l'échange on retire les ressource demander au joueur et ajoute celle proposer
-                if (ressourceDemanderRand == 0):
-                    $ nourriture -= ressourceDemanderNombre
+                    if (ressourceDemanderRand == 0):
+                        $ nourriture -= ressourceDemanderNombre
 
-                elif (ressourceDemanderRand == 1):
-                    $ eau -= ressourceDemanderNombre
+                    elif (ressourceDemanderRand == 1):
+                        $ eau -= ressourceDemanderNombre
 
-                elif (ressourceDemanderRand == 2):
-                    $ argent -= ressourceDemanderNombre
+                    elif (ressourceDemanderRand == 2):
+                        $ argent -= ressourceDemanderNombre
 
-                if (ressourceProposerRand == 0):
-                    $ nourriture += ressourceProposerNombre
+                    if (ressourceProposerRand == 0):
+                        $ nourriture += ressourceProposerNombre
 
-                elif (ressourceProposerRand == 1):
-                    $ eau += ressourceProposerNombre
-                    if eauMax > eau:
-                        $ eau = eauMax
+                    elif (ressourceProposerRand == 1):
+                        $ eau += ressourceProposerNombre
+                        if eauMax > eau:
+                            $ eau = eauMax
 
-                elif (ressourceProposerRand == 2):
-                    $ argent += ressourceProposerNombre
+                    elif (ressourceProposerRand == 2):
+                        $ argent += ressourceProposerNombre
 
-                jump nouveau_jour
-
-
-            "Refuser":
-                $ combattre = renpy.random.randint(0,1) #Si le joueur refuse l'échange il a une chance sur deux de devoir se battre
-
-                if (combattre == 1):
+                    chat "Bien sûr que vous acceptez !"
                     jump nouveau_jour
 
-                else:
+                "Refuser":
+                    $ combattre = renpy.random.randint(0,1) #Si le joueur refuse l'échange il a une chance sur deux de devoir se battre
+                    if (combattre == 1):
+                        chat "Pardon ? Hm, je n’en avais pas spécialement besoin de toute façon."
+                        jump nouveau_jour
+
+                    else:
+                        chat "Vous me faites bien rire, comme si vous aviez le choix !"
+                        jump combat
+
+                "Attaquer":
+                    chat "Comme vous êtes rude ! Je vais vous enseigner la politesse, moi !"
                     jump combat
 
-            "Attaquer":
-                jump combat
+        #Si c'est le clan "Combat"
+        else:
+            menu:
+                chat "Hé, vermine ! Donne-moi [ressourceDemanderNombre][ressourceDemander] et je te donne [ressourceProposerNombre] [ressourceProposer]."
 
-label dialog0:
-    chat "0"
-    jump dialogue
+                "Accepter" if joueurEchange:
 
-label dialog1:
-    chat "1"
-    jump dialogue
+                    if (ressourceDemanderRand == 0):
+                        $ nourriture -= ressourceDemanderNombre
 
-label dialog2:
-    chat "2"
-    jump dialogue
+                    elif (ressourceDemanderRand == 1):
+                        $ eau -= ressourceDemanderNombre
 
-label dialog3:
-    chat "3"
-    jump dialogue
+                    elif (ressourceDemanderRand == 2):
+                        $ argent -= ressourceDemanderNombre
 
-label dialog4:
-    chat "4"
-    jump dialogue
+                    if (ressourceProposerRand == 0):
+                        $ nourriture += ressourceProposerNombre
 
-label dialog5:
-    chat "5"
-    jump dialogue
+                    elif (ressourceProposerRand == 1):
+                        $ eau += ressourceProposerNombre
+                        if eauMax > eau:
+                            $ eau = eauMax
 
-label dialog6:
-    chat "6"
-    jump dialogue
+                    elif (ressourceProposerRand == 2):
+                        $ argent += ressourceProposerNombre
+
+                    chat "..."
+                    jump nouveau_jour
+
+                "Refuser":
+                    $ combattre = renpy.random.randint(0,1) #Si le joueur refuse l'échange il a une chance sur deux de devoir se battre
+                    if (combattre == 1):
+                        chat "Pff. On se reverra."
+                        jump nouveau_jour
+
+                    else:
+                        chat "Tu vas le regretter !"
+                        jump combat
+
+                "Attaquer":
+                    chat "Je vais te réduire en bouillie, minable !"
+                    jump combat
+
 
 label combat:   #Ecran de combat
 
@@ -499,14 +571,16 @@ label combat:   #Ecran de combat
 
     else:
         if (ressourceDemanderRand == 0):
-            $ nourriture -= int(20+nourriture*0.25)
+            $ nourriture -= ressourceDemanderNombre
+            $ nourritureAdv += ressourceDemanderNombre
 
         elif (ressourceDemanderRand == 1):
-            $ eau -= int(15+eau*0.25)
+            $ eau -= ressourceDemanderNombre
+            $ eauAdv += ressourceDemanderNombre
 
         elif (ressourceDemanderRand == 2):
-            $ argent -= int(30+argent*0.25)
-
+            $ argent -= ressourceDemanderNombre
+            $ argentAdv += ressourceDemanderNombre
 
         $ membreClan1 += int(math.ceil(0.5 *int(5+membre*0.1)))   #Les deux clans adverses se partage les membres qui partent
         $ membreClan2 += int(math.floor(0.5 *int(5+membre*0.1)))
@@ -531,7 +605,7 @@ label combat_gagner:    #Afficher les boutons pour voler les ressource si le com
     jump combat_gagner
 
 label post_combat_gagner:
-    if eau>eauMax:
+    if eau > eauMax:
         $ eau = eauMax
 
     $ membre = int(membre)  #les membre du joueur sont convertie en integ pour ne pas avoir de chiffre a virgule dans l'interface
@@ -572,8 +646,10 @@ label nouveau_jour: #Changement de jour
         jump gagner
 
     python:
-        for i in range(5):
-            listSceneUsed[i] = 0
+        for i in range(2):
+            listSceneUsed[i] = listSceneUsed[i+2]
+            listSceneUsed[i+2] = 0
+
     $ nourriture -= membre/2    #Les membres du joueur mangent
     $ nourriturePerdu = membre/2
 

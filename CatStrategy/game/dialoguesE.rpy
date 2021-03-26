@@ -254,51 +254,24 @@ label dialogueE10:
 #----------------------------------------------------------------------------------------------------------------------
 
 label dialogueE11:
-    $ randomChance = renpy.random.randint(1,2)  #Random pour le choix qui a une chance sur trois
+    $ randomChance = renpy.random.randint(1,3)  #Random pour le choix qui a une chance sur trois
 
     menu:   #"menu:" veux dire qu'on va proposer un choix au joueur
 
-        chat "Chef ! Un énorme bruit venant de la surface et un séisme se sont fait ressentir dans tout le souterrain. Nos chats ont peur." #Texte du chat qui nous parle (on met chat avant un dialogue quand c'est l'un de nos chat qui nous parle)
+        chat "Quelle horreur ! Les fermes à Catnabis se sont fait dévaliser ! Qu’allons-nous faire ?" #Texte du chat qui nous parle (on met chat avant un dialogue quand c'est l'un de nos chat qui nous parle)
 
-        " Payer 40 brins de Catnabis pour prendre parole devant les chats et les rassurer.":  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
-            if randomChance == 1:    #Une chance sur trois que ça se passe bien
-                chat "Vous avez été fantastique chef ! Quatre chats d’autres clans nous ont rejoints quand ils ont vu à quel point vous étiez attentif à nos besoins !"
-                $ argent -= 40  # le dollar veux dire qu'on écrit en python, c'est surtout utilisé pour modifié ou créer une valeur
-                $ membre += 4
-
-                #On perd des membres donc les autres clans doivent en gagner, mais uniquement si ils sont encore vivant
-                if !clan1Vivant:    #si le clan 1 est mort, le clan 2 prend tout
-                    $ membreClan2 -= 4
-
-                elif !clan2Vivant
-                    $ membreClan1 -= 4
-
-                else:   #si les deux sont encore vivant on partage
-                    $ membreClan1 -= 2
-                    $ membreClan2 -= 2
+        " Payer 10 rats pour retrouver les voleurs":  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
+            chat "Les voleurs ont été appréhendés ! Le Catnabis volé a été récupéré !"
+            $ nourrite -= 10
 
 
-            else:   #Si le joueur n'a pas eu le 1 chance sur 3 que ça se passe bien
-                chat "Vous vous êtes plutôt bien débrouillé, chef. Les chats se sont calmés."
-                $ argent -= 40
-
-
-        "Ne rien faire.":  #Deuxième choix du joueur
+        "Partir vous-même à la poursuite des voleurs.":  #Deuxième choix du joueur
             if randomChance == 1:
-                chat "La plupart des chats se sont calmés d’eux-mêmes. Cependant, deux chats ont décidé de partir pour un autre clan dont le chef a su tenir un discours des plus rassurants."
-                $ membre -= 2
-
-                if !clan1Vivant:
-                    $ membreClan2 += 2
-
-                elif !clan2Vivant
-                    $ membreClan1 += 2
-
-                else:
-                    $ membreClan1 += 2
+                chat "Wow, vous avez réussi, bravo chef, vous avez tout récupéré. J’espère que vous leur avez fait payer !"
 
             else:
-                chat "La plupart des chats se sont calmés d’eux-mêmes. En espérant qu’ils soient tous aussi conciliants la prochaine fois."
+                chat "Rah, bien essayé, mais vous ne les avez pas rattrapés…"
+                $ argent = int((argent/3)*2)
 
     jump dialogue #a la fin on reviens aux label dialogue qui va choisir un autre dialogue
 
@@ -310,11 +283,11 @@ label dialogueE12:
 
     menu:   #"menu:" veux dire qu'on va proposer un choix au joueur
 
-        chat "Chef ! Un énorme bruit venant de la surface et un séisme se sont fait ressentir dans tout le souterrain. Nos chats ont peur." #Texte du chat qui nous parle (on met chat avant un dialogue quand c'est l'un de nos chat qui nous parle)
+        chat "Nous avons besoin de plus de membres dans notre clan ! Que souhaitez-vous faire ?" #Texte du chat qui nous parle (on met chat avant un dialogue quand c'est l'un de nos chat qui nous parle)
 
-        " Payer 40 brins de Catnabis pour prendre parole devant les chats et les rassurer.":  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
+        " Payer 40 brins de Catnabis pour créer une campagne publicitaire.":  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
             if randomChance == 1:    #Une chance sur trois que ça se passe bien
-                chat "Vous avez été fantastique chef ! Quatre chats d’autres clans nous ont rejoints quand ils ont vu à quel point vous étiez attentif à nos besoins !"
+                chat "“Wow, elle a vraiment fait fureur ! Elle nous a ramené quatre nouveaux chats !"
                 $ argent -= 40  # le dollar veux dire qu'on écrit en python, c'est surtout utilisé pour modifié ou créer une valeur
                 $ membre += 4
 
@@ -331,26 +304,54 @@ label dialogueE12:
 
 
             else:   #Si le joueur n'a pas eu le 1 chance sur 3 que ça se passe bien
-                chat "Vous vous êtes plutôt bien débrouillé, chef. Les chats se sont calmés."
+                chat "Elle nous a ramené 1 nouveau chat, c’est déjà pas mal, non ?"
                 $ argent -= 40
+                $ membre += 1
 
-
-        "Ne rien faire.":  #Deuxième choix du joueur
-            if randomChance == 1:
-                chat "La plupart des chats se sont calmés d’eux-mêmes. Cependant, deux chats ont décidé de partir pour un autre clan dont le chef a su tenir un discours des plus rassurants."
-                $ membre -= 2
-
-                if !clan1Vivant:
-                    $ membreClan2 += 2
+                #On perd des membres donc les autres clans doivent en gagner, mais uniquement si ils sont encore vivant
+                if !clan1Vivant:    #si le clan 1 est mort, le clan 2 prend tout
+                    $ membreClan2 -= 1
 
                 elif !clan2Vivant
-                    $ membreClan1 += 2
+                    $ membreClan1 -= 1
+
+                else:   #si les deux sont encore vivant on partage
+                    $ membreClan1 -= 1
+
+
+        "Payer 5 rats pour que vos chats fassent un spectacle inter-clan.":  #Deuxième choix du joueur
+            if randomChance == 1:
+                chat "Haha, le spectacle a cartonné ! 3 chats se sont joints à nous !"
+                $ membre += 3
+                $ nourriture -= 5
+
+                if !clan1Vivant:
+                    $ membreClan2 -= 3
+
+                elif !clan2Vivant
+                    $ membreClan1 -= 3
 
                 else:
-                    $ membreClan1 += 2
+                    $ membreClan1 -= 2
+                    $ membreClan2 -= 1
 
             else:
-                chat "La plupart des chats se sont calmés d’eux-mêmes. En espérant qu’ils soient tous aussi conciliants la prochaine fois."
+                chat "Aïe, c’était… pitoyable. L’un de nos chats s’est tellement senti mal à l’aise qu’il a préféré partir."
+                $ membre -= 1
+                $ nourriture -= 5
+
+                if !clan1Vivant:
+                    $ membreClan2 += 1
+
+                elif !clan2Vivant
+                    $ membreClan1 += 1
+
+                else:
+                    $ membreClan1 -= 1
+
+        "Ne rien faire":
+            chat "Ne faisons rien alors..."
+
 
     jump dialogue #a la fin on reviens aux label dialogue qui va choisir un autre dialogue
 
@@ -362,47 +363,30 @@ label dialogueE13:
 
     menu:   #"menu:" veux dire qu'on va proposer un choix au joueur
 
-        chat "Chef ! Un énorme bruit venant de la surface et un séisme se sont fait ressentir dans tout le souterrain. Nos chats ont peur." #Texte du chat qui nous parle (on met chat avant un dialogue quand c'est l'un de nos chat qui nous parle)
+        chat "Ma femme a réalisé ces super cookies ! Vous voulez en acheter ?" #Texte du chat qui nous parle (on met chat avant un dialogue quand c'est l'un de nos chat qui nous parle)
 
-        " Payer 40 brins de Catnabis pour prendre parole devant les chats et les rassurer.":  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
-            if randomChance == 1:    #Une chance sur trois que ça se passe bien
-                chat "Vous avez été fantastique chef ! Quatre chats d’autres clans nous ont rejoints quand ils ont vu à quel point vous étiez attentif à nos besoins !"
-                $ argent -= 40  # le dollar veux dire qu'on écrit en python, c'est surtout utilisé pour modifié ou créer une valeur
-                $ membre += 4
+        "Acheter les cookies pour 10 brins de Catnabis.":  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
+            chat "Vous êtes si généreux, merci !"
+            $ argent -= 10
+
+        "Refuser":  #Deuxième choix du joueur
+            if randomChance == 1:
+                chat "C’est vraiment dommage, ils sont si délicieux !"
+
+            else:
+                chat "Hm, nous allons en faire pour un autre chef de clan. Lui peut-être saura apprécier nos efforts !"
+                $ membre -= 2
 
                 #On perd des membres donc les autres clans doivent en gagner, mais uniquement si ils sont encore vivant
                 if !clan1Vivant:    #si le clan 1 est mort, le clan 2 prend tout
-                    $ membreClan2 -= 4
-
-                elif !clan2Vivant
-                    $ membreClan1 -= 4
-
-                else:   #si les deux sont encore vivant on partage
-                    $ membreClan1 -= 2
-                    $ membreClan2 -= 2
-
-
-            else:   #Si le joueur n'a pas eu le 1 chance sur 3 que ça se passe bien
-                chat "Vous vous êtes plutôt bien débrouillé, chef. Les chats se sont calmés."
-                $ argent -= 40
-
-
-        "Ne rien faire.":  #Deuxième choix du joueur
-            if randomChance == 1:
-                chat "La plupart des chats se sont calmés d’eux-mêmes. Cependant, deux chats ont décidé de partir pour un autre clan dont le chef a su tenir un discours des plus rassurants."
-                $ membre -= 2
-
-                if !clan1Vivant:
                     $ membreClan2 += 2
 
                 elif !clan2Vivant
                     $ membreClan1 += 2
 
-                else:
-                    $ membreClan1 += 2
+                else:   #si les deux sont encore vivant on partage
+                    $ membreClan2 += 2
 
-            else:
-                chat "La plupart des chats se sont calmés d’eux-mêmes. En espérant qu’ils soient tous aussi conciliants la prochaine fois."
 
     jump dialogue #a la fin on reviens aux label dialogue qui va choisir un autre dialogue
 
@@ -412,49 +396,35 @@ label dialogueE13:
 label dialogueE14:
     $ randomChance = renpy.random.randint(1,2)  #Random pour le choix qui a une chance sur trois
 
-    menu:   #"menu:" veux dire qu'on va proposer un choix au joueur
+    menu:
+        chat "Pierre, feuille, ciseaux !"
 
-        chat "Chef ! Un énorme bruit venant de la surface et un séisme se sont fait ressentir dans tout le souterrain. Nos chats ont peur." #Texte du chat qui nous parle (on met chat avant un dialogue quand c'est l'un de nos chat qui nous parle)
-
-        " Payer 40 brins de Catnabis pour prendre parole devant les chats et les rassurer.":  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
-            if randomChance == 1:    #Une chance sur trois que ça se passe bien
-                chat "Vous avez été fantastique chef ! Quatre chats d’autres clans nous ont rejoints quand ils ont vu à quel point vous étiez attentif à nos besoins !"
-                $ argent -= 40  # le dollar veux dire qu'on écrit en python, c'est surtout utilisé pour modifié ou créer une valeur
-                $ membre += 4
-
-                #On perd des membres donc les autres clans doivent en gagner, mais uniquement si ils sont encore vivant
-                if !clan1Vivant:    #si le clan 1 est mort, le clan 2 prend tout
-                    $ membreClan2 -= 4
-
-                elif !clan2Vivant
-                    $ membreClan1 -= 4
-
-                else:   #si les deux sont encore vivant on partage
-                    $ membreClan1 -= 2
-                    $ membreClan2 -= 2
-
-
-            else:   #Si le joueur n'a pas eu le 1 chance sur 3 que ça se passe bien
-                chat "Vous vous êtes plutôt bien débrouillé, chef. Les chats se sont calmés."
-                $ argent -= 40
-
-
-        "Ne rien faire.":  #Deuxième choix du joueur
+        "Pierre.":
             if randomChance == 1:
-                chat "La plupart des chats se sont calmés d’eux-mêmes. Cependant, deux chats ont décidé de partir pour un autre clan dont le chef a su tenir un discours des plus rassurants."
-                $ membre -= 2
-
-                if !clan1Vivant:
-                    $ membreClan2 += 2
-
-                elif !clan2Vivant
-                    $ membreClan1 += 2
-
-                else:
-                    $ membreClan1 += 2
+                chat "Feuille ! Ha vous avez perdu ! Vous me devez 2 rats !"
+                $ nourriture -= 2
 
             else:
-                chat "La plupart des chats se sont calmés d’eux-mêmes. En espérant qu’ils soient tous aussi conciliants la prochaine fois."
+                chat "Ciseaux ! Rah, bien joué… Tenez, 20 brins de Catnabis..."
+                $ argent += 20
+
+        "Feuille.":
+            if randomChance == 1:
+                chat "Ciseaux ! Ha vous avez perdu ! Vous me devez 2 rats !"
+                $ nourriture -= 2
+
+            else:
+                chat "Pierre ! Rah, bien joué… Tenez, 20 brins de Catnabis..."
+                $ argent += 20
+
+        "Ciseaux":
+            if randomChance == 1:
+                chat "Pierre ! Ha vous avez perdu ! Vous me devez 2 rats !"
+                $ nourriture -= 2
+
+            else:
+                chat "Feuille ! Rah, bien joué… Tenez, 20 brins de Catnabis..."
+                $ argent += 20
 
     jump dialogue #a la fin on reviens aux label dialogue qui va choisir un autre dialogue
 
@@ -462,103 +432,36 @@ label dialogueE14:
 #----------------------------------------------------------------------------------------------------------------------
 
 label dialogueE15:
-    $ randomChance = renpy.random.randint(1,2)  #Random pour le choix qui a une chance sur trois
 
-    menu:   #"menu:" veux dire qu'on va proposer un choix au joueur
+    menu:
+        chat "Les chiens sont des être diaboliques, n’est-ce pas ? Pourquoi est-ce que les humains les préfèrent à nous ?"
 
-        chat "Chef ! Un énorme bruit venant de la surface et un séisme se sont fait ressentir dans tout le souterrain. Nos chats ont peur." #Texte du chat qui nous parle (on met chat avant un dialogue quand c'est l'un de nos chat qui nous parle)
+        "Lui dire que les humains sont stupides.":
+            chat "Moui, ça m’en a tout l’air ! Mais bon, ils avaient l’air si gentils avec nous autrefois..."
 
-        " Payer 40 brins de Catnabis pour prendre parole devant les chats et les rassurer.":  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
-            if randomChance == 1:    #Une chance sur trois que ça se passe bien
-                chat "Vous avez été fantastique chef ! Quatre chats d’autres clans nous ont rejoints quand ils ont vu à quel point vous étiez attentif à nos besoins !"
-                $ argent -= 40  # le dollar veux dire qu'on écrit en python, c'est surtout utilisé pour modifié ou créer une valeur
-                $ membre += 4
-
-                #On perd des membres donc les autres clans doivent en gagner, mais uniquement si ils sont encore vivant
-                if !clan1Vivant:    #si le clan 1 est mort, le clan 2 prend tout
-                    $ membreClan2 -= 4
-
-                elif !clan2Vivant
-                    $ membreClan1 -= 4
-
-                else:   #si les deux sont encore vivant on partage
-                    $ membreClan1 -= 2
-                    $ membreClan2 -= 2
+        "Lui dire que les chiens ne sont pas si ignobles.":
+            chat "C’est vrai ? C’est… inattendu..."
 
 
-            else:   #Si le joueur n'a pas eu le 1 chance sur 3 que ça se passe bien
-                chat "Vous vous êtes plutôt bien débrouillé, chef. Les chats se sont calmés."
-                $ argent -= 40
-
-
-        "Ne rien faire.":  #Deuxième choix du joueur
-            if randomChance == 1:
-                chat "La plupart des chats se sont calmés d’eux-mêmes. Cependant, deux chats ont décidé de partir pour un autre clan dont le chef a su tenir un discours des plus rassurants."
-                $ membre -= 2
-
-                if !clan1Vivant:
-                    $ membreClan2 += 2
-
-                elif !clan2Vivant
-                    $ membreClan1 += 2
-
-                else:
-                    $ membreClan1 += 2
-
-            else:
-                chat "La plupart des chats se sont calmés d’eux-mêmes. En espérant qu’ils soient tous aussi conciliants la prochaine fois."
-
-    jump dialogue #a la fin on reviens aux label dialogue qui va choisir un autre dialogue
+    jump dialogue
 
 
 #----------------------------------------------------------------------------------------------------------------------
 
 label dialogueE16:
-    $ randomChance = renpy.random.randint(1,2)  #Random pour le choix qui a une chance sur trois
 
-    menu:   #"menu:" veux dire qu'on va proposer un choix au joueur
+    menu:
+        chat "Chef, regardez, j’ai trouvé de quoi remplir 50% d’un silo d’eau. Je vous propose ça contre 8 rats. Entendu ?"
 
-        chat "Chef ! Un énorme bruit venant de la surface et un séisme se sont fait ressentir dans tout le souterrain. Nos chats ont peur." #Texte du chat qui nous parle (on met chat avant un dialogue quand c'est l'un de nos chat qui nous parle)
+        "Accepter.":
+            chat "Ah génial, j’espère que vous ne boirez pas tout d’un coup !"
+            $ eau += 50
+            if eau > eauMax:
+                eau = eauMax
 
-        " Payer 40 brins de Catnabis pour prendre parole devant les chats et les rassurer.":  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
-            if randomChance == 1:    #Une chance sur trois que ça se passe bien
-                chat "Vous avez été fantastique chef ! Quatre chats d’autres clans nous ont rejoints quand ils ont vu à quel point vous étiez attentif à nos besoins !"
-                $ argent -= 40  # le dollar veux dire qu'on écrit en python, c'est surtout utilisé pour modifié ou créer une valeur
-                $ membre += 4
+        "Refuser.":
+            chat "Dans ce cas, je garde toute cette eau pour moi !"
 
-                #On perd des membres donc les autres clans doivent en gagner, mais uniquement si ils sont encore vivant
-                if !clan1Vivant:    #si le clan 1 est mort, le clan 2 prend tout
-                    $ membreClan2 -= 4
-
-                elif !clan2Vivant
-                    $ membreClan1 -= 4
-
-                else:   #si les deux sont encore vivant on partage
-                    $ membreClan1 -= 2
-                    $ membreClan2 -= 2
-
-
-            else:   #Si le joueur n'a pas eu le 1 chance sur 3 que ça se passe bien
-                chat "Vous vous êtes plutôt bien débrouillé, chef. Les chats se sont calmés."
-                $ argent -= 40
-
-
-        "Ne rien faire.":  #Deuxième choix du joueur
-            if randomChance == 1:
-                chat "La plupart des chats se sont calmés d’eux-mêmes. Cependant, deux chats ont décidé de partir pour un autre clan dont le chef a su tenir un discours des plus rassurants."
-                $ membre -= 2
-
-                if !clan1Vivant:
-                    $ membreClan2 += 2
-
-                elif !clan2Vivant
-                    $ membreClan1 += 2
-
-                else:
-                    $ membreClan1 += 2
-
-            else:
-                chat "La plupart des chats se sont calmés d’eux-mêmes. En espérant qu’ils soient tous aussi conciliants la prochaine fois."
 
     jump dialogue #a la fin on reviens aux label dialogue qui va choisir un autre dialogue
 
@@ -570,101 +473,23 @@ label dialogueE17:
 
     menu:   #"menu:" veux dire qu'on va proposer un choix au joueur
 
-        chat "Chef ! Un énorme bruit venant de la surface et un séisme se sont fait ressentir dans tout le souterrain. Nos chats ont peur." #Texte du chat qui nous parle (on met chat avant un dialogue quand c'est l'un de nos chat qui nous parle)
+        chat "Monsieur le chef, j’ai, genre, ultra méga faim là ! Soit vous me donnez 3 rats, soit je vais voir ailleurs !" #Texte du chat qui nous parle (on met chat avant un dialogue quand c'est l'un de nos chat qui nous parle)
 
-        " Payer 40 brins de Catnabis pour prendre parole devant les chats et les rassurer.":  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
-            if randomChance == 1:    #Une chance sur trois que ça se passe bien
-                chat "Vous avez été fantastique chef ! Quatre chats d’autres clans nous ont rejoints quand ils ont vu à quel point vous étiez attentif à nos besoins !"
-                $ argent -= 40  # le dollar veux dire qu'on écrit en python, c'est surtout utilisé pour modifié ou créer une valeur
-                $ membre += 4
+        "Lui donner 3 rats":
+            chat "Je vais m'éclater la panse ! Ce soir, c'est plateau-télé !"
+            $ nourriture -= 3
 
-                #On perd des membres donc les autres clans doivent en gagner, mais uniquement si ils sont encore vivant
-                if !clan1Vivant:    #si le clan 1 est mort, le clan 2 prend tout
-                    $ membreClan2 -= 4
+        "Refuser.":
+            chat "Dans ce cas, adieu !"
+            $ membre -= 1
 
-                elif !clan2Vivant
-                    $ membreClan1 -= 4
+            if !clan1Vivant:
+                $ membreClan2 += 1
 
-                else:   #si les deux sont encore vivant on partage
-                    $ membreClan1 -= 2
-                    $ membreClan2 -= 2
-
-
-            else:   #Si le joueur n'a pas eu le 1 chance sur 3 que ça se passe bien
-                chat "Vous vous êtes plutôt bien débrouillé, chef. Les chats se sont calmés."
-                $ argent -= 40
-
-
-        "Ne rien faire.":  #Deuxième choix du joueur
-            if randomChance == 1:
-                chat "La plupart des chats se sont calmés d’eux-mêmes. Cependant, deux chats ont décidé de partir pour un autre clan dont le chef a su tenir un discours des plus rassurants."
-                $ membre -= 2
-
-                if !clan1Vivant:
-                    $ membreClan2 += 2
-
-                elif !clan2Vivant
-                    $ membreClan1 += 2
-
-                else:
-                    $ membreClan1 += 2
+            elif !clan2Vivant
+                $ membreClan1 += 1
 
             else:
-                chat "La plupart des chats se sont calmés d’eux-mêmes. En espérant qu’ils soient tous aussi conciliants la prochaine fois."
+                $ membreClan2 += 1
 
     jump dialogue #a la fin on reviens aux label dialogue qui va choisir un autre dialogue
-
-
-#----------------------------------------------------------------------------------------------------------------------
-
-label dialogueE18:
-    $ randomChance = renpy.random.randint(1,2)  #Random pour le choix qui a une chance sur trois
-
-    menu:   #"menu:" veux dire qu'on va proposer un choix au joueur
-
-        chat "Chef ! Un énorme bruit venant de la surface et un séisme se sont fait ressentir dans tout le souterrain. Nos chats ont peur." #Texte du chat qui nous parle (on met chat avant un dialogue quand c'est l'un de nos chat qui nous parle)
-
-        " Payer 40 brins de Catnabis pour prendre parole devant les chats et les rassurer.":  #un texte avec :  après c'est l'un des choix pour le joueur, le tete entre guillemets c'est ce que verra le joueur
-            if randomChance == 1:    #Une chance sur trois que ça se passe bien
-                chat "Vous avez été fantastique chef ! Quatre chats d’autres clans nous ont rejoints quand ils ont vu à quel point vous étiez attentif à nos besoins !"
-                $ argent -= 40  # le dollar veux dire qu'on écrit en python, c'est surtout utilisé pour modifié ou créer une valeur
-                $ membre += 4
-
-                #On perd des membres donc les autres clans doivent en gagner, mais uniquement si ils sont encore vivant
-                if !clan1Vivant:    #si le clan 1 est mort, le clan 2 prend tout
-                    $ membreClan2 -= 4
-
-                elif !clan2Vivant
-                    $ membreClan1 -= 4
-
-                else:   #si les deux sont encore vivant on partage
-                    $ membreClan1 -= 2
-                    $ membreClan2 -= 2
-
-
-            else:   #Si le joueur n'a pas eu le 1 chance sur 3 que ça se passe bien
-                chat "Vous vous êtes plutôt bien débrouillé, chef. Les chats se sont calmés."
-                $ argent -= 40
-
-
-        "Ne rien faire.":  #Deuxième choix du joueur
-            if randomChance == 1:
-                chat "La plupart des chats se sont calmés d’eux-mêmes. Cependant, deux chats ont décidé de partir pour un autre clan dont le chef a su tenir un discours des plus rassurants."
-                $ membre -= 2
-
-                if !clan1Vivant:
-                    $ membreClan2 += 2
-
-                elif !clan2Vivant
-                    $ membreClan1 += 2
-
-                else:
-                    $ membreClan1 += 2
-
-            else:
-                chat "La plupart des chats se sont calmés d’eux-mêmes. En espérant qu’ils soient tous aussi conciliants la prochaine fois."
-
-    jump dialogue #a la fin on reviens aux label dialogue qui va choisir un autre dialogue
-
-
-#----------------------------------------------------------------------------------------------------------------------

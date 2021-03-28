@@ -1,0 +1,10 @@
+﻿I'm sorry, but errors were detected in your script. Please correct the
+errors listed below, and try again.
+
+
+File "game/dialoguesE.rpy", line 252: end of line expected.
+    jump dialogue    jump dialogue
+                     ^
+
+Ren'Py Version: Ren'Py 7.4.2.1292
+Sun Mar 28 07:23:22 2021

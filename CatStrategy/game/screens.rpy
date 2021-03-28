@@ -94,7 +94,8 @@ style frame:
 ## and id "window" to apply style properties.
 ##
 ## https://www.renpy.org/doc/html/screen_special.html#say
-
+define what_ypos = -365
+define what_xpos = -150
 screen say(who, what):
     style_prefix "say"
 
@@ -107,8 +108,11 @@ screen say(who, what):
                 id "namebox"
                 style "namebox"
                 text who id "who"
+                text what id "what" xpos what_xpos ypos what_ypos
 
-        text what id "what"
+
+        else:
+            text what id "what"
 
 
     ## If there's a side image, display it above the text. Do not display on the
@@ -135,6 +139,7 @@ style window:
     xfill True
     yalign gui.textbox_yalign
     ysize gui.textbox_height
+    xsize gui.textbox_width
 
     background Image("gui/textbox.png", xalign=0.5, yalign=1.0)
 
@@ -223,7 +228,7 @@ style choice_button_text is button_text
 
 style choice_vbox:
     xalign 0.5
-    ypos 270
+    yalign 0.67
     yanchor 0.5
 
     spacing gui.choice_spacing
@@ -245,22 +250,7 @@ screen quick_menu():
     ## Ensure this appears on top of other screens.
     zorder 100
 
-    if quick_menu:
 
-        hbox:
-            style_prefix "quick"
-
-            xalign 0.5
-            yalign 1.0
-
-            textbutton _("Back") action Rollback()
-            textbutton _("History") action ShowMenu('history')
-            textbutton _("Skip") action Skip() alternate Skip(fast=True, confirm=True)
-            textbutton _("Auto") action Preference("auto-forward", "toggle")
-            textbutton _("Save") action ShowMenu('save')
-            textbutton _("Q.Save") action QuickSave()
-            textbutton _("Q.Load") action QuickLoad()
-            textbutton _("Prefs") action ShowMenu('preferences')
 
 
 ## This code ensures that the quick_menu screen is displayed in-game, whenever
@@ -295,44 +285,35 @@ screen navigation():
         style_prefix "navigation"
 
         xpos gui.navigation_xpos
-        yalign 0.5
-
-        spacing gui.navigation_spacing
+        yalign 0.85
+        spacing 25
 
         if main_menu:
 
-            textbutton _("Start") action Start()
+            imagebutton :
+                xanchor 0.5
+                yanchor 0.5
+                idle ("bouton_jouer")
+                hover ("bouton_jouer_hover")
+                action Start()
 
         else:
 
-            textbutton _("History") action ShowMenu("history")
+            imagebutton :
+                idle _("History")
+                action ShowMenu("history")
 
-            textbutton _("Save") action ShowMenu("save")
-
-        textbutton _("Load") action ShowMenu("load")
-
-        textbutton _("Preferences") action ShowMenu("preferences")
-
-        if _in_replay:
-
-            textbutton _("End Replay") action EndReplay(confirm=True)
-
-        elif not main_menu:
-
-            textbutton _("Main Menu") action MainMenu()
-
-        textbutton _("About") action ShowMenu("about")
-
-        if renpy.variant("pc") or (renpy.variant("web") and not renpy.variant("mobile")):
-
-            ## Help isn't necessary or relevant to mobile devices.
-            textbutton _("Help") action ShowMenu("help")
 
         if renpy.variant("pc"):
 
             ## The quit button is banned on iOS and unnecessary on Android and
             ## Web.
-            textbutton _("Quit") action Quit(confirm=not main_menu)
+            imagebutton:
+                xanchor 0.5
+                yanchor 0.5
+                idle ("bouton_quitter")
+                hover ("bouton_quitter_hover")
+                action Quit(confirm=not main_menu)
 
 
 style navigation_button is gui_button
@@ -357,26 +338,18 @@ screen main_menu():
     ## This ensures that any other menu screen is replaced.
     tag menu
 
+    style_prefix "main_menu"
+
     add gui.main_menu_background
 
     ## This empty frame darkens the main menu.
     frame:
-        style "main_menu_frame"
+        pass
 
     ## The use statement includes another screen inside this one. The actual
     ## contents of the main menu are in the navigation screen.
     use navigation
 
-    if gui.show_name:
-
-        vbox:
-            style "main_menu_vbox"
-
-            text "[config.name!t]":
-                style "main_menu_title"
-
-            text "[config.version]":
-                style "main_menu_version"
 
 
 style main_menu_frame is empty

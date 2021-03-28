@@ -1,0 +1,22 @@
+﻿I'm sorry, but an uncaught exception occurred.
+
+While running game code:
+  File "game/dialoguesE.rpy", line 459, in script
+    menu:
+TypeError: %d format: a number is required, not TagQuotingDict
+
+-- Full Traceback ------------------------------------------------------------
+
+Full traceback:
+  File "game/dialoguesE.rpy", line 459, in script
+    menu:
+  File "renpy/ast.py", line 715, in execute
+    renpy.exports.say(who, what, *args, **kwargs)
+  File "renpy/exports.py", line 1373, in say
+    what = what % tag_quoting_dict
+TypeError: %d format: a number is required, not TagQuotingDict
+
+Windows-10-10.0.19041
+Ren'Py 7.4.2.1292
+CatStrategy 1.0
+Sun Mar 28 07:15:37 2021
